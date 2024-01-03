@@ -23,15 +23,13 @@ async function selectLevel(index) {
 }
 </script>
 <template>
-    <div class="root">
-        <div class="div-container-center">
-            <h1>Poke Memories</h1>
-            <p>Select mode to start game</p>
-            <div class="div-button-level">
-                <ButtonCustom v-for="(button, index) in  buttons " :text-color="button.textColor" :label="button.label"
-                    :rank="button.rank" :background-color="button.backgroundColor" @mouseover="hoverButton(index)"
-                    @mouseleave="leaveButton(index)" @click="selectLevel(index)" />
-            </div>
+    <div class="div-container-center">
+        <h1>Poke Memories</h1>
+        <p>Select mode to start game</p>
+        <div class="div-button-level">
+            <ButtonCustom v-for="(button, index) in  buttons " :text-color="button.textColor" :label="button.label"
+                :rank="button.rank" :background-color="button.backgroundColor" @mouseover="hoverButton(index)"
+                @mouseleave="leaveButton(index)" @click="selectLevel(index)" />
         </div>
     </div>
 </template>

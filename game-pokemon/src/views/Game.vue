@@ -16,6 +16,7 @@ const flippedCards = ref([]);
 const show = ref(false)
 const duration = ref(parseInt(route.params.level) * 10 * 1000)
 const elapsed = ref(0)
+const colorProcess = ref('#6a1b9a');
 let lastTime
 let handle
 
@@ -40,9 +41,13 @@ function reset() {
     update()
 }
 
-const completedProcessbar = computed(() =>
-    Math.min(elapsed.value / duration.value, 1) * 100
+const completedProcessbar = computed(() => {
+    const result = Math.min(elapsed.value / duration.value, 1) * 100
+    console.log(result.toFixed());
+    return result;
+}
 )
+
 reset()
 
 onUnmounted(() => {
@@ -76,8 +81,6 @@ function createPokemon(length) {
     return finalList;
 };
 function toggleCard(index) {
-    showResult("You win");
-    return;
     const selectedCard = this.pokemons[index];
     // Check if the card is already flipped or matched
     if (!selectedCard.isFlipped || this.flippedCards.length >= 2) {
@@ -125,7 +128,7 @@ function checkForMatch() {
     <Transition name="bounce">
         <div v-if="show">
             <div class="center-process-bar">
-                <ProcessBar :bgcolor="'#6a1b9a'" :completed="completedProcessbar" :maxwidth="maxwidthProcess" />
+                <ProcessBar :bgcolor="colorProcess" :completed="completedProcessbar" :maxwidth="maxwidthProcess" />
             </div>
             <div class="grid-container" :style="{ gridTemplateColumns: gridColumns }">
                 <div v-for="(item, index) in pokemons" :key="index">
@@ -162,11 +165,11 @@ function checkForMatch() {
 .grid-container {
     display: grid;
     gap: 10px;
-    margin-left: auto;
-    margin-right: auto;
+    padding-top: 20px;
 }
 
 .center-process-bar {
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
