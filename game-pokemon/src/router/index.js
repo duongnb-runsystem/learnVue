@@ -4,7 +4,7 @@ import Result from '../views/Result.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
     { path: '/', name: 'Home', component: Home },
-    { path: '/game/:level', name: 'Game', component: Game },
+    { path: '/game', name: 'Game', component: Game },
     { path: '/result', name: 'Result', component: Result }
 ]
 const router = createRouter({

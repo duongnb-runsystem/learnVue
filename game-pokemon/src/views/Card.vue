@@ -1,15 +1,12 @@
-<script>
-export default {
-    props: {
-        Pokemon: String,
-        isFlipped: Boolean,
-    },
-    methods: {
-        handleCardClick() {
-            this.$emit('card-click');
-        }
-    },
-};
+<script setup>
+const props = defineProps({
+    Pokemon: String,
+    isFlipped: Boolean,
+});
+const emit = defineEmits(['card-click']);
+function handleCardClick() {
+    emit('card-click');
+}
 </script>
 
 <template>

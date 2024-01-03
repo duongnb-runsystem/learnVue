@@ -1,19 +1,4 @@
-<template>
-    <div class="root">
-        <div class="div-container-center">
-            <h1>Poke Memories</h1>
-            <p>Select mode to start game</p>
-            <div class="div-button-level">
-                <div class="button-select-level" v-for="(button, index) in  buttons " @mouseover="hoverButton(index)"
-                    @mouseleave="leaveButton(index)" @click="selectLevel(index)"
-                    :style="{ backgroundColor: button.backgroundColor, }">
-                    <span class="span-title" :style="{ color: button.textColor }">{{ button.label }}</span>
-                    <span class="span-rank" :style="{ color: button.textColor }">{{ button.rank }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
+
 <script setup>
 import { ref } from 'vue'
 import router from '../router';
@@ -36,3 +21,19 @@ async function selectLevel(index) {
     router.push({ name: 'Game', params: { level: this.buttons[index].col } });
 }
 </script>
+<template>
+    <div class="root">
+        <div class="div-container-center">
+            <h1>Poke Memories</h1>
+            <p>Select mode to start game</p>
+            <div class="div-button-level">
+                <div class="button-select-level" v-for="(button, index) in  buttons " @mouseover="hoverButton(index)"
+                    @mouseleave="leaveButton(index)" @click="selectLevel(index)"
+                    :style="{ backgroundColor: button.backgroundColor, }">
+                    <span class="span-title" :style="{ color: button.textColor }">{{ button.label }}</span>
+                    <span class="span-rank" :style="{ color: button.textColor }">{{ button.rank }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
