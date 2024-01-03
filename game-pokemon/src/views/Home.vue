@@ -2,6 +2,7 @@
 <script setup>
 import { ref } from 'vue'
 import router from '../router';
+import ButtonCustom from './ButtonCustom.vue'
 const buttons = ref([
     { label: '4x4', col: '4', rank: 'Ez', backgroundColor: 'transparent', textColor: '#EE9d9d' },
     { label: '6x6', col: '6', rank: 'Normal', backgroundColor: 'transparent', textColor: '#EE9d9d' },
@@ -27,12 +28,9 @@ async function selectLevel(index) {
             <h1>Poke Memories</h1>
             <p>Select mode to start game</p>
             <div class="div-button-level">
-                <div class="button-select-level" v-for="(button, index) in  buttons " @mouseover="hoverButton(index)"
-                    @mouseleave="leaveButton(index)" @click="selectLevel(index)"
-                    :style="{ backgroundColor: button.backgroundColor, }">
-                    <span class="span-title" :style="{ color: button.textColor }">{{ button.label }}</span>
-                    <span class="span-rank" :style="{ color: button.textColor }">{{ button.rank }}</span>
-                </div>
+                <ButtonCustom v-for="(button, index) in  buttons " :text-color="button.textColor" :label="button.label"
+                    :rank="button.rank" :background-color="button.backgroundColor" @mouseover="hoverButton(index)"
+                    @mouseleave="leaveButton(index)" @click="selectLevel(index)" />
             </div>
         </div>
     </div>

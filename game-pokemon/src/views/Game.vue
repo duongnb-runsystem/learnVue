@@ -3,23 +3,29 @@
 import Card from './Card.vue'
 import { useRoute } from 'vue-router';
 import routers from '../router';
-import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, onBeforeMount } from 'vue'
 import ProcessBar from './ProcessBar.vue';
+
+
 const route = useRoute();
 const level = ref(route.params.level);
 const gridColumns = ref(`repeat(${route.params.level}, 1fr)`);
 const maxwidthProcess = ref(parseInt(route.params.level) * 100);
 const pokemons = ref(createPokemon(route.params.level));
 const flippedCards = ref([]);
-
+const show = ref(false)
 const duration = ref(parseInt(route.params.level) * 10 * 1000)
 const elapsed = ref(0)
 let lastTime
 let handle
 
+onBeforeMount(() => {
+    setTimeout(() => {
+        show.value = !show.value
+    }, 0)
+})
 
 function update() {
-    console.log('elapsed.value' + elapsed.value);
     elapsed.value = performance.now() - lastTime
     if (elapsed.value >= duration.value) {
         cancelAnimationFrame(handle)
@@ -44,10 +50,8 @@ onUnmounted(() => {
 })
 
 function createPokemon(length) {
-    console.log('createPokemon' + length);
     let photoUrls = [];
     for (let i = 1; i <= length; i++) {
-        console.log('photo id' + i)
         photoUrls.push({ id: i, url: '/pokemon/' + i + '.png', alt: 'Photo' + i, isFlipped: true });
     };
 
@@ -72,6 +76,8 @@ function createPokemon(length) {
     return finalList;
 };
 function toggleCard(index) {
+    showResult("You win");
+    return;
     const selectedCard = this.pokemons[index];
     // Check if the card is already flipped or matched
     if (!selectedCard.isFlipped || this.flippedCards.length >= 2) {
@@ -93,18 +99,16 @@ function toggleCard(index) {
     }
 };
 function showResult(message) {
-    routers.replace({ name: 'Result', params: { message: message } });
+    routers.replace({ name: 'Result', params: { message: message, point: completedProcessbar.value } });
 };
 function checkForMatch() {
     const [card1, card2] = this.flippedCards;
 
     if (card1.url === card2.url) {
-        console.log('Same');
         // Match found, update show property to prevent further interactions with the matched cards
         card1.isFlipped = false;
         card2.isFlipped = false;
     } else {
-        console.log('Not Same');
         // No match, flip the cards back after a short delay
         setTimeout(() => {
             card1.isFlipped = true;
@@ -118,17 +122,43 @@ function checkForMatch() {
 
 </script>
 <template>
-    <div class="center-process-bar">
-        <ProcessBar :bgcolor="'#6a1b9a'" :completed="completedProcessbar" :maxwidth="maxwidthProcess" />
-    </div>
-    <div class="grid-container" :style="{ gridTemplateColumns: gridColumns }">
-        <div v-for="(item, index) in pokemons" :key="index">
-            <Card :Pokemon="item.url" :isFlipped="item.isFlipped" @card-click="toggleCard(index)" />
+    <Transition name="bounce">
+        <div v-if="show">
+            <div class="center-process-bar">
+                <ProcessBar :bgcolor="'#6a1b9a'" :completed="completedProcessbar" :maxwidth="maxwidthProcess" />
+            </div>
+            <div class="grid-container" :style="{ gridTemplateColumns: gridColumns }">
+                <div v-for="(item, index) in pokemons" :key="index">
+                    <Card :Pokemon="item.url" :isFlipped="item.isFlipped" @card-click="toggleCard(index)" />
+                </div>
+            </div>
         </div>
-    </div>
+    </Transition>
 </template>
 
 <style scoped>
+.bounce-enter-active {
+    animation: bounce-in 0.5s;
+}
+
+.bounce-leave-active {
+    animation: bounce-in 0.5s reverse;
+}
+
+@keyframes bounce-in {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.25);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
 .grid-container {
     display: grid;
     gap: 10px;
