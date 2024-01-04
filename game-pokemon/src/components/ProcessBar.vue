@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 const props = defineProps({
-    bgColor: String,
     completed: Number,
     maxWidth: Number,
+    colorProcess: String,
 })
 
 const fillerStyles = computed(() => {
@@ -19,7 +19,7 @@ const widthProcess = computed(() => {
     return `${props.completed}%`;
 });
 const colorProcess = computed(() => {
-    if (props.completed > 80) {
+    if (props.completed > 90) {
         return "red";
     } else if (props.completed > 50) {
         return "orange";

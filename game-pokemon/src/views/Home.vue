@@ -4,14 +4,14 @@ import { ref } from 'vue'
 import router from '@/router';
 import ButtonCustom from '@/components/ButtonCustom.vue'
 const buttons = ref([
-    { label: '4x4', col: '4', rank: 'Ez' },
-    { label: '6x6', col: '6', rank: 'Normal' },
-    { label: '8x8', col: '8', rank: 'Hard' },
-    { label: '10x10', col: '10', rank: 'Super Hard' },
+    { label: '4x4', param: '4', rank: 'Ez' },
+    { label: '6x6', param: '6', rank: 'Normal' },
+    { label: '8x8', param: '8', rank: 'Hard' },
+    { label: '10x10', param: '10', rank: 'Super Hard' },
 ]);
 
 const selectLevel = (index) => {
-    router.push({ name: 'Game', params: { level: buttons.value[index].col } });
+    router.push({ name: 'Game', params: { level: buttons.value[index].param } });
 }
 </script>
 <template>
@@ -24,20 +24,3 @@ const selectLevel = (index) => {
         </div>
     </div>
 </template>
-<style scoped>
-.div-button-level {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.div-container-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    box-sizing: border-box;
-}
-</style>

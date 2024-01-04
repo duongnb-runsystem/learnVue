@@ -2,6 +2,7 @@
 const props = defineProps({
     Pokemon: String,
     isFlipped: Boolean,
+    isSelected: Boolean,
 });
 const emit = defineEmits(['card-click']);
 </script>
@@ -36,6 +37,10 @@ const emit = defineEmits(['card-click']);
 
 .flipped {
     transform: rotateY(180deg);
+}
+
+.selected {
+    border: 2px solid red;
 }
 
 .card-face {

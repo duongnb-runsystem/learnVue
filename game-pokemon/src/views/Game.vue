@@ -1,14 +1,14 @@
  
-<script setup>
+<script setup >
 import Card from '@/components/Card.vue'
 import { useRoute } from 'vue-router';
 import routers from '@/router';
-import { ref, computed, onUnmounted, onBeforeMount } from 'vue'
+import { ref, computed, onUnmounted, onBeforeMount, onMounted } from 'vue'
 import ProcessBar from '@/components/ProcessBar.vue'
 
 
 const route = useRoute();
-const gridColumns = ref();
+const gridColumns = ref('');
 const maxWidthProcess = ref();
 const pokemons = ref();
 const flippedCards = ref([]);
@@ -19,7 +19,7 @@ const lastTime = ref();
 const handle = ref();
 const widthCard = ref();
 const heightCard = ref();
-
+const point = ref(0);
 onBeforeMount(() => {
     setTimeout(() => {
         show.value = !show.value
@@ -28,28 +28,33 @@ onBeforeMount(() => {
     var lv = parseInt(route.params.level);
     pokemons.value = createPokemon(lv);
     maxWidthProcess.value = lv * 100;
-    duration.value = lv * 10000;
     switch (lv) {
         case 4:
             heightCard.value = `200px`;
             widthCard.value = `130px`;
+            duration.value = 30 * 1000;
             break;
         case 6:
             heightCard.value = `127px`;
             widthCard.value = `95px`;
+            duration.value = 40 * 1000;
             break;
         case 8:
             heightCard.value = `91px`;
             widthCard.value = `69px`;
+            duration.value = 50 * 1000;
             break;
         case 10:
-            heightCard.value = `70px`;
-            widthCard.value = `60px`;
+            heightCard.value = `75px`;
+            widthCard.value = `70px`;
+            duration.value = 60 * 1000;
             break;
     }
     gridColumns.value = `repeat(${route.params.level}, ${widthCard.value})`;
 })
-
+onMounted(() => {
+    // playSound("audioBackground");
+})
 const update = () => {
     elapsed.value = performance.now() - lastTime.value
     if (elapsed.value >= duration.value) {
@@ -68,9 +73,17 @@ const reset = () => {
 const completedProcessbar = computed(() => {
     const result = Math.min(elapsed.value / duration.value, 1) * 100
     return result;
-}
-)
-
+})
+const colorProcess = computed(() => {
+    if ((duration.value - elapsed.value) < 4 * 1000) {
+        playSound("audioDanger")
+        return "red";
+    } else if ((duration.value - elapsed.value) > 20 * 1000) {
+        return "orange";
+    } else {
+        return "green";
+    }
+});
 reset()
 
 onUnmounted(() => {
@@ -80,7 +93,7 @@ onUnmounted(() => {
 const createPokemon = (length) => {
     let photoUrls = [];
     for (let i = 1; i <= length; i++) {
-        photoUrls.push({ id: i, url: '/pokemon/' + i + '.png', alt: 'Photo' + i, isFlipped: true });
+        photoUrls.push({ id: i, url: '/pokemon/' + i + '.png', alt: 'Photo' + i, isFlipped: true, isSelected: false });
     };
 
     // Double the array photo
@@ -104,14 +117,15 @@ const createPokemon = (length) => {
     return finalList;
 };
 const toggleCard = (index) => {
-    showResult("You win");
-    return;
+    // showResult("You win");
+    // return;
     const selectedCard = pokemons.value[index];
     // Check if the card is already flipped or matched
     if (!selectedCard.isFlipped || flippedCards.value.length >= 2) {
         return;
     }
     selectedCard.isFlipped = !selectedCard.isFlipped;
+    selectedCard.isSelected = true;
     flippedCards.value.push(selectedCard);
     if (flippedCards.value.length === 2) {
         setTimeout(() => {
@@ -126,20 +140,32 @@ const toggleCard = (index) => {
     }
 };
 const showResult = (message) => {
-    routers.replace({ name: 'Result', params: { message: message, point: completedProcessbar.value } });
+    console.log(point.value);
+    routers.replace({ name: 'Result', params: { message: message, point: point.value } });
 };
+const playSound = (id) => {
+    var audio = document.getElementById(id);
+    audio?.play();
+}
+const pauseSound = (id) => {
+    var audio = document.getElementById(id);
+    audio?.pause();
+}
+
 const checkForMatch = () => {
     const [card1, card2] = flippedCards.value;
     if (card1.url === card2.url) {
         // Match found, update show property to prevent further interactions with the matched cards
         card1.isFlipped = false;
         card2.isFlipped = false;
+        point.value += 10;
     } else {
+        playSound("audioToggleFail")
         // No match, flip the cards back after a short delay
         setTimeout(() => {
             card1.isFlipped = true;
             card2.isFlipped = true;
-        }, 300);
+        }, 1000);
     }
 
     // Clear the flipped cards array
@@ -148,13 +174,22 @@ const checkForMatch = () => {
 
 </script>
 <template>
+    <audio id="audioBackground" hidden="true">
+        <source src="@/assets/sound/soundBackground.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioToggleFail" hidden="true">
+        <source src="@/assets/sound/soundNope.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioDanger" hidden="true">
+        <source src="@/assets/sound/soundDanger.mp3" type="audio/mpeg">
+    </audio>
     <Transition name="bounce">
         <div v-if="show">
             <div class="center-process-bar">
-                <ProcessBar :completed="completedProcessbar" :maxWidth="maxWidthProcess" />
+                <ProcessBar :completed="completedProcessbar" :maxWidth="maxWidthProcess" :colorProcess="colorProcess" />
             </div>
             <div class="grid-container" :style="{ gridTemplateColumns: gridColumns }">
-                <Card v-for="(item, index) in pokemons" :style="{ width: widthCard, height: heightCard }" :key="index"
+                <Card v-for="( item, index ) in  pokemons " :style="{ width: widthCard, height: heightCard }" :key="index"
                     :Pokemon="item.url" :isFlipped="item.isFlipped" @card-click="toggleCard(index)" />
             </div>
         </div>
