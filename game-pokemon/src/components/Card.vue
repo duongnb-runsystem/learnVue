@@ -4,13 +4,10 @@ const props = defineProps({
     isFlipped: Boolean,
 });
 const emit = defineEmits(['card-click']);
-function handleCardClick() {
-    emit('card-click');
-}
 </script>
 
 <template>
-    <div class="card-backside" @click="handleCardClick">
+    <div class="card-backside" @click=" emit('card-click')">
         <div class="card-flip-container" :class="{ flipped: isFlipped }">
             <div class="card-face card-front">
                 <img class="imgPokemon" alt="Pokemon" :src=Pokemon />
@@ -24,16 +21,15 @@ function handleCardClick() {
 
 <style scoped>
 .card-backside {
-    width: 150px;
-    height: 200px;
     perspective: 1000px;
     cursor: pointer;
+    width: 100%;
+    height: 100%;
 }
 
 .card-flip-container {
     width: 100%;
     height: 100%;
-
     transform-style: preserve-3d;
     transition: transform 0.5s;
 }
@@ -52,7 +48,7 @@ function handleCardClick() {
     height: 100%;
     backface-visibility: hidden;
     box-shadow: 0 0 25px rgb(14, 13, 13);
-    border-radius: 25px;
+    border-radius: 15%;
 }
 
 .card-front {

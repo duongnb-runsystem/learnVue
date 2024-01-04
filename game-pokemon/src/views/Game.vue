@@ -1,49 +1,72 @@
  
 <script setup>
-import Card from './Card.vue'
+import Card from '@/components/Card.vue'
 import { useRoute } from 'vue-router';
-import routers from '../router';
+import routers from '@/router';
 import { ref, computed, onUnmounted, onBeforeMount } from 'vue'
-import ProcessBar from './ProcessBar.vue';
+import ProcessBar from '@/components/ProcessBar.vue'
 
 
 const route = useRoute();
-const level = ref(route.params.level);
-const gridColumns = ref(`repeat(${route.params.level}, 1fr)`);
-const maxwidthProcess = ref(parseInt(route.params.level) * 100);
-const pokemons = ref(createPokemon(route.params.level));
+const gridColumns = ref();
+const maxWidthProcess = ref();
+const pokemons = ref();
 const flippedCards = ref([]);
 const show = ref(false)
-const duration = ref(parseInt(route.params.level) * 10 * 1000)
+const duration = ref()
 const elapsed = ref(0)
-const colorProcess = ref('#6a1b9a');
-let lastTime
-let handle
+const lastTime = ref();
+const handle = ref();
+const widthCard = ref();
+const heightCard = ref();
 
 onBeforeMount(() => {
     setTimeout(() => {
         show.value = !show.value
     }, 0)
+
+    var lv = parseInt(route.params.level);
+    pokemons.value = createPokemon(lv);
+    maxWidthProcess.value = lv * 100;
+    duration.value = lv * 10000;
+    switch (lv) {
+        case 4:
+            heightCard.value = `200px`;
+            widthCard.value = `130px`;
+            break;
+        case 6:
+            heightCard.value = `127px`;
+            widthCard.value = `95px`;
+            break;
+        case 8:
+            heightCard.value = `91px`;
+            widthCard.value = `69px`;
+            break;
+        case 10:
+            heightCard.value = `70px`;
+            widthCard.value = `60px`;
+            break;
+    }
+    gridColumns.value = `repeat(${route.params.level}, ${widthCard.value})`;
 })
 
-function update() {
-    elapsed.value = performance.now() - lastTime
+const update = () => {
+    elapsed.value = performance.now() - lastTime.value
     if (elapsed.value >= duration.value) {
-        cancelAnimationFrame(handle)
+        cancelAnimationFrame(handle.value)
         showResult("You Lose");
     } else {
-        handle = requestAnimationFrame(update)
+        handle.value = requestAnimationFrame(update)
     }
 }
-function reset() {
+const reset = () => {
     elapsed.value = 0
-    lastTime = performance.now()
+    lastTime.value = performance.now()
     update()
 }
 
 const completedProcessbar = computed(() => {
     const result = Math.min(elapsed.value / duration.value, 1) * 100
-    console.log(result.toFixed());
     return result;
 }
 )
@@ -51,10 +74,10 @@ const completedProcessbar = computed(() => {
 reset()
 
 onUnmounted(() => {
-    cancelAnimationFrame(handle)
+    cancelAnimationFrame(handle.value)
 })
 
-function createPokemon(length) {
+const createPokemon = (length) => {
     let photoUrls = [];
     for (let i = 1; i <= length; i++) {
         photoUrls.push({ id: i, url: '/pokemon/' + i + '.png', alt: 'Photo' + i, isFlipped: true });
@@ -80,33 +103,33 @@ function createPokemon(length) {
 
     return finalList;
 };
-function toggleCard(index) {
-    const selectedCard = this.pokemons[index];
+const toggleCard = (index) => {
+    showResult("You win");
+    return;
+    const selectedCard = pokemons.value[index];
     // Check if the card is already flipped or matched
-    if (!selectedCard.isFlipped || this.flippedCards.length >= 2) {
+    if (!selectedCard.isFlipped || flippedCards.value.length >= 2) {
         return;
     }
     selectedCard.isFlipped = !selectedCard.isFlipped;
-    this.flippedCards.push(selectedCard);
-    if (this.flippedCards.length === 2) {
+    flippedCards.value.push(selectedCard);
+    if (flippedCards.value.length === 2) {
         setTimeout(() => {
-            this.checkForMatch();
+            checkForMatch();
         }, 500);
     }
-    console.log('toggleCard');
     // Check if all cards are flipped
-    if (this.pokemons.every(card => !card.isFlipped)) {
+    if (pokemons.value.every(card => !card.isFlipped)) {
         setTimeout(() => {
             showResult("You win");
         }, 1000);
     }
 };
-function showResult(message) {
+const showResult = (message) => {
     routers.replace({ name: 'Result', params: { message: message, point: completedProcessbar.value } });
 };
-function checkForMatch() {
-    const [card1, card2] = this.flippedCards;
-
+const checkForMatch = () => {
+    const [card1, card2] = flippedCards.value;
     if (card1.url === card2.url) {
         // Match found, update show property to prevent further interactions with the matched cards
         card1.isFlipped = false;
@@ -120,7 +143,7 @@ function checkForMatch() {
     }
 
     // Clear the flipped cards array
-    this.flippedCards = [];
+    flippedCards.value = [];
 };
 
 </script>
@@ -128,12 +151,11 @@ function checkForMatch() {
     <Transition name="bounce">
         <div v-if="show">
             <div class="center-process-bar">
-                <ProcessBar :bgcolor="colorProcess" :completed="completedProcessbar" :maxwidth="maxwidthProcess" />
+                <ProcessBar :completed="completedProcessbar" :maxWidth="maxWidthProcess" />
             </div>
             <div class="grid-container" :style="{ gridTemplateColumns: gridColumns }">
-                <div v-for="(item, index) in pokemons" :key="index">
-                    <Card :Pokemon="item.url" :isFlipped="item.isFlipped" @card-click="toggleCard(index)" />
-                </div>
+                <Card v-for="(item, index) in pokemons" :style="{ width: widthCard, height: heightCard }" :key="index"
+                    :Pokemon="item.url" :isFlipped="item.isFlipped" @card-click="toggleCard(index)" />
             </div>
         </div>
     </Transition>
@@ -164,6 +186,8 @@ function checkForMatch() {
 
 .grid-container {
     display: grid;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
     padding-top: 20px;
 }
