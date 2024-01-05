@@ -155,6 +155,7 @@ const pauseSound = (id) => {
 const checkForMatch = () => {
     const [card1, card2] = flippedCards.value;
     if (card1.url === card2.url) {
+        playSound("audioToggleTrue")
         // Match found, update show property to prevent further interactions with the matched cards
         card1.isFlipped = false;
         card2.isFlipped = false;
@@ -165,7 +166,7 @@ const checkForMatch = () => {
         setTimeout(() => {
             card1.isFlipped = true;
             card2.isFlipped = true;
-        }, 1000);
+        }, 500);
     }
 
     // Clear the flipped cards array
@@ -178,7 +179,10 @@ const checkForMatch = () => {
         <source src="@/assets/sound/soundBackground.mp3" type="audio/mpeg">
     </audio>
     <audio id="audioToggleFail" hidden="true">
-        <source src="@/assets/sound/soundNope.mp3" type="audio/mpeg">
+        <source src="@/assets/sound/soundNopecut.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioToggleTrue" hidden="true">
+        <source src="@/assets/sound/soundCollect.mp3" type="audio/mpeg">
     </audio>
     <audio id="audioDanger" hidden="true">
         <source src="@/assets/sound/soundDanger.mp3" type="audio/mpeg">
