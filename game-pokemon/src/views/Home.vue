@@ -35,8 +35,8 @@ const toggleRank = () => {
                 @click="selectLevel(index)" />
         </div>
         <div class="div-button-level">
-            <ButtonImg :img=srcPlaySound @click="toggleSound" />
-            <ButtonImg :img="'img/ranking.svg'" @click="toggleRank" />
+            <ButtonImg :img=srcPlaySound style="margin-top: 20px;margin-right:10px;" @click="toggleSound" />
+            <ButtonImg :img="'img/ranking.svg'" style="margin-top: 20px;" @click="toggleRank" />
         </div>
     </div>
 </template>

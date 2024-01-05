@@ -10,8 +10,6 @@ const props = defineProps({
 </template>
 <style scoped>
 .div-volume {
-    margin-top: 10px;
-    margin-left: 10px;
     display: flex;
     justify-content: center;
     flex-direction: column;
