@@ -19,7 +19,7 @@ const lastTime = ref();
 const handle = ref();
 const widthCard = ref();
 const heightCard = ref();
-const point = ref(0);
+
 onBeforeMount(() => {
     setTimeout(() => {
         show.value = !show.value
@@ -27,33 +27,39 @@ onBeforeMount(() => {
 
     var lv = parseInt(route.params.level);
     pokemons.value = createPokemon(lv);
-    maxWidthProcess.value = lv * 100;
     switch (lv) {
         case 4:
-            heightCard.value = `200px`;
+            heightCard.value = `190px`;
             widthCard.value = `130px`;
             duration.value = 30 * 1000;
+            maxWidthProcess.value = ((130 + 10) * lv) - 20;
             break;
         case 6:
-            heightCard.value = `127px`;
+            heightCard.value = `120px`;
             widthCard.value = `95px`;
             duration.value = 40 * 1000;
+            maxWidthProcess.value = ((95 + 10) * lv) - 20;
             break;
         case 8:
             heightCard.value = `91px`;
-            widthCard.value = `69px`;
+            widthCard.value = `70px`;
             duration.value = 50 * 1000;
+            maxWidthProcess.value = ((70 + 10) * lv) - 20;
             break;
         case 10:
-            heightCard.value = `75px`;
-            widthCard.value = `70px`;
+            heightCard.value = `70px`;
+            widthCard.value = `60px`;
             duration.value = 60 * 1000;
+            maxWidthProcess.value = ((60 + 10) * lv) - 20;
             break;
     }
+
+
     gridColumns.value = `repeat(${route.params.level}, ${widthCard.value})`;
 })
 onMounted(() => {
-    // playSound("audioBackground");
+    playSound("audioBackground");
+
 })
 const update = () => {
     elapsed.value = performance.now() - lastTime.value
@@ -75,10 +81,12 @@ const completedProcessbar = computed(() => {
     return result;
 })
 const colorProcess = computed(() => {
-    if ((duration.value - elapsed.value) < 4 * 1000) {
+    var time = duration.value - elapsed.value;
+    if (time <= 4 * 1000) {
+        pauseSound("audioBackground")
         playSound("audioDanger")
         return "red";
-    } else if ((duration.value - elapsed.value) > 20 * 1000) {
+    } else if (time <= 20 * 1000) {
         return "orange";
     } else {
         return "green";
@@ -117,8 +125,6 @@ const createPokemon = (length) => {
     return finalList;
 };
 const toggleCard = (index) => {
-    // showResult("You win");
-    // return;
     const selectedCard = pokemons.value[index];
     // Check if the card is already flipped or matched
     if (!selectedCard.isFlipped || flippedCards.value.length >= 2) {
@@ -140,14 +146,31 @@ const toggleCard = (index) => {
     }
 };
 const showResult = (message) => {
-    console.log(point.value);
-    routers.replace({ name: 'Result', params: { message: message, point: point.value } });
+    var time = parseInt(duration.value - elapsed.value).toFixed();
+    var point = time < 0 ? 0 : time;
+    if (message == "You win") {
+        var key = "rankPoints" + route.params.level;
+        var rankPoints = JSON.parse(localStorage.getItem(key));
+        if (rankPoints == null)
+            rankPoints = [];
+        rankPoints.push(point);
+        rankPoints.sort((a, b) => b - a);
+        rankPoints.splice(10);
+        localStorage.setItem(key, JSON.stringify(rankPoints));
+    }
+    routers.replace({ name: 'Result', params: { message: message, point: point } });
 };
 const playSound = (id) => {
+    var playSoundStorage = localStorage.getItem('playSound');
+    if (playSoundStorage == "false")
+        return;
     var audio = document.getElementById(id);
     audio?.play();
 }
 const pauseSound = (id) => {
+    var playSoundStorage = localStorage.getItem('playSound');
+    if (playSoundStorage == "false")
+        return;
     var audio = document.getElementById(id);
     audio?.pause();
 }
@@ -159,13 +182,16 @@ const checkForMatch = () => {
         // Match found, update show property to prevent further interactions with the matched cards
         card1.isFlipped = false;
         card2.isFlipped = false;
-        point.value += 10;
+        card1.isSelected = false;
+        card2.isSelected = false;
     } else {
         playSound("audioToggleFail")
         // No match, flip the cards back after a short delay
         setTimeout(() => {
             card1.isFlipped = true;
             card2.isFlipped = true;
+            card1.isSelected = false;
+            card2.isSelected = false;
         }, 500);
     }
 
@@ -194,7 +220,8 @@ const checkForMatch = () => {
             </div>
             <div class="grid-container" :style="{ gridTemplateColumns: gridColumns }">
                 <Card v-for="( item, index ) in  pokemons " :style="{ width: widthCard, height: heightCard }" :key="index"
-                    :Pokemon="item.url" :isFlipped="item.isFlipped" @card-click="toggleCard(index)" />
+                    :pokemon="item.url" :isFlipped="item.isFlipped" :isSelected="item.isSelected"
+                    @card-click="toggleCard(index)" />
             </div>
         </div>
     </Transition>

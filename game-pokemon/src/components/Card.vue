@@ -1,6 +1,6 @@
 <script setup>
 const props = defineProps({
-    Pokemon: String,
+    pokemon: String,
     isFlipped: Boolean,
     isSelected: Boolean,
 });
@@ -10,8 +10,8 @@ const emit = defineEmits(['card-click']);
 <template>
     <div class="card-backside" @click=" emit('card-click')">
         <div class="card-flip-container" :class="{ flipped: isFlipped }">
-            <div class="card-face card-front">
-                <img class="imgPokemon" alt="Pokemon" :src=Pokemon />
+            <div class="card-face card-front" :class="{ selected: isSelected }">
+                <img class="imgPokemon" alt="Pokemon" :src=pokemon />
             </div>
             <div class="card-face card-back">
                 <img class="imgPokemon" alt="Pokemon" src="/pokemon/icon_back.png" />
@@ -33,6 +33,7 @@ const emit = defineEmits(['card-click']);
     height: 100%;
     transform-style: preserve-3d;
     transition: transform 0.5s;
+
 }
 
 .flipped {
@@ -40,7 +41,7 @@ const emit = defineEmits(['card-click']);
 }
 
 .selected {
-    border: 2px solid red;
+    border: 3px solid rgb(238, 255, 0);
 }
 
 .card-face {
@@ -59,6 +60,7 @@ const emit = defineEmits(['card-click']);
 .card-front {
     background-color: rgba(244, 155, 159, 1);
 }
+
 
 .card-back {
     background-color: rgba(130, 63, 94, 1);
