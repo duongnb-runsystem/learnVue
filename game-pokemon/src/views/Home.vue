@@ -13,7 +13,7 @@ const buttons = ref([
     { label: '10x10', param: '10', rank: 'Super Hard' },
 ]);
 onMounted(() => {
-    playSound.value = localStorage.getItem('playSound') == "true";
+    playSound.value = localStorage.getItem('playSound') === "true";
 })
 const selectLevel = (index) => {
     localStorage.setItem('level', buttons.value[index].param);
@@ -31,11 +31,11 @@ const toggleRank = () => {
     <div class="c-center">
         <h1>Poke Memories</h1>
         <p>Select mode to start game</p>
-        <div class="div-button-level">
+        <div class="c-btn-level">
             <ButtonCustom v-for="(button, index) in  buttons " :label="button.label" :rank="button.rank"
                 @click="selectLevel(index)" />
         </div>
-        <div class="div-button-level">
+        <div class="c-btn-level">
             <ButtonImg :img=srcPlaySound @click="toggleSound" />
             <ButtonImg :img="'img/ranking.svg'" @click="toggleRank" />
         </div>

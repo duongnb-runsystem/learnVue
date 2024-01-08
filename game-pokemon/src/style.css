@@ -62,7 +62,7 @@ button:focus-visible {
   padding-bottom: 50px;
 }
 
-.div-button-level {
+.c-btn-level {
   display: flex;
   justify-content: center;
   align-items: center;

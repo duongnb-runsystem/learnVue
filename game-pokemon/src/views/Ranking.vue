@@ -11,7 +11,7 @@ const goBack = () => {
 <template>
     <div class="c-center">
         <h1>Ranking</h1>
-        <div class="div-grid-rank">
+        <div class="grid-rank">
             <TableRank rank="4" />
             <TableRank rank="6" />
             <TableRank rank="8" />
@@ -21,7 +21,7 @@ const goBack = () => {
     </div>
 </template>
 <style scoped>
-.div-grid-rank {
+.grid-rank {
     grid-template-columns: repeat(4, auto);
     display: grid;
     align-items: center;

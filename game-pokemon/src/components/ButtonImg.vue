@@ -4,12 +4,12 @@ const props = defineProps({
 })
 </script>
 <template>
-    <div class="div-volume">
+    <div class="btn-img">
         <img :src=img />
     </div>
 </template>
 <style scoped>
-.div-volume {
+.btn-img {
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -24,11 +24,11 @@ const props = defineProps({
     background-color: transparent;
 }
 
-.div-volume:hover {
+.btn-img:hover {
     border: 2px solid #ffffff;
 }
 
-.div-volume img {
+.btn-img img {
     width: 100%;
     height: 100%;
 }

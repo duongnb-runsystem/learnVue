@@ -23,7 +23,7 @@ onBeforeMount(() => {
 
     intervalCountDown.value = setInterval(() => {
         countDownTime.value--;
-        if (countDownTime.value == 0) {
+        if (countDownTime.value === 0) {
             startAgain();
         }
     }, 1000)
@@ -41,14 +41,14 @@ const startAgain = () => {
     router.replace({ path: '/' });
 }
 onMounted(() => {
-    if (message.value == "You win")
+    if (message.value === "You win")
         playSound("audioWin");
     else
         playSound("audioLose");
 })
 const playSound = (id) => {
     var playSoundStorage = localStorage.getItem('playSound');
-    if (playSoundStorage == "false")
+    if (playSoundStorage === "false")
         return;
     var audio = document.getElementById(id);
     audio?.play();

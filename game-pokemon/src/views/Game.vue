@@ -119,8 +119,6 @@ const createPokemon = (length) => {
     return finalList;
 };
 const toggleCard = (index) => {
-    showResult('You win');
-    return;
     const selectedCard = pokemons.value[index];
     // Check if the card is already flipped or matched
     if (!selectedCard.isFlipped || flippedCards.value.length >= 2) {
@@ -147,7 +145,7 @@ const showResult = (message) => {
     if (message == "You win") {
         var key = "rankPoints" + route.params.level;
         var rankPoints = JSON.parse(localStorage.getItem(key));
-        if (rankPoints == null)
+        if (rankPoints === null)
             rankPoints = [];
         rankPoints.push(point);
         rankPoints.sort((a, b) => b - a);
@@ -167,7 +165,7 @@ const playSound = (id) => {
 }
 const pauseSound = (id) => {
     var playSoundStorage = localStorage.getItem('playSound');
-    if (playSoundStorage == "false")
+    if (playSoundStorage === "false")
         return;
     var audio = document.getElementById(id);
     audio?.pause();
