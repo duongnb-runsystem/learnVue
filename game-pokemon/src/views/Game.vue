@@ -93,7 +93,7 @@ onUnmounted(() => {
 })
 
 const createPokemon = (length) => {
-    let photoUrls = [];
+    const photoUrls = [];
     for (let i = 1; i <= length; i++) {
         photoUrls.push({ id: i, url: '/pokemon/' + i + '.png', alt: 'Photo' + i, isFlipped: true, isSelected: false });
     };
