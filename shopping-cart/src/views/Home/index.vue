@@ -7,6 +7,7 @@ const nameProduct = ref(null);
 const priceProduct = ref(null);
 const imgProduct = ref(null);
 const descriptionProduct = ref(null);
+
 const instance = axios.create({
   headers: {
     'x-foody-client-type': '1',
@@ -20,9 +21,14 @@ const instance = axios.create({
 
 })
 const getData = async () => {
-  const res = await instance.get('api/dish/get_delivery_dishes?id_type=2&request_id=16980');
+  // url quan
+  //https://shopeefood.vn/ho-chi-minh/phuc-long-cong-hoa
+  //get id quan
+  var url = await instance.get('api/delivery/get_from_url?url=ho-chi-minh/phuc-long-cong-hoa')
+  console.log(url);
+  const res = await instance.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${url.data.reply.delivery_id}`);
   data.value = res.data.reply.menu_infos;
-  console.log(data.value);
+  console.log(res.data.reply);
 }
 getData();
 const showDetail = ref(false);

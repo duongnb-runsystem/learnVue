@@ -19,48 +19,41 @@ const lastTime = ref();
 const handle = ref();
 const widthCard = ref();
 const heightCard = ref();
-
-onBeforeMount(() => {
+const heightDefaultCard = ref(190);
+const widthDefaultCard = ref(130);
+const ratio = ref(1);
+onMounted(() => {
     setTimeout(() => {
         show.value = !show.value
     }, 0)
-
-    var lv = parseInt(route.params.level);
+    const lv = parseInt(localStorage.getItem('level'));
     pokemons.value = createPokemon(lv);
     switch (lv) {
         case 4:
-            heightCard.value = `190px`;
-            widthCard.value = `130px`;
+            ratio.value = 1;
             duration.value = 30 * 1000;
-            maxWidthProcess.value = ((130 + 10) * lv) - 20;
             break;
         case 6:
-            heightCard.value = `120px`;
-            widthCard.value = `95px`;
+            ratio.value = 0.65;
             duration.value = 40 * 1000;
-            maxWidthProcess.value = ((95 + 10) * lv) - 20;
             break;
         case 8:
-            heightCard.value = `91px`;
-            widthCard.value = `70px`;
+            ratio.value = 0.48;
             duration.value = 50 * 1000;
-            maxWidthProcess.value = ((70 + 10) * lv) - 20;
             break;
         case 10:
-            heightCard.value = `70px`;
-            widthCard.value = `60px`;
+            ratio.value = 0.37;
             duration.value = 60 * 1000;
-            maxWidthProcess.value = ((60 + 10) * lv) - 20;
             break;
     }
+    heightCard.value = `${heightDefaultCard.value * ratio.value}px`;
+    widthCard.value = `${widthDefaultCard.value * ratio.value}px`;
+    maxWidthProcess.value = ((widthDefaultCard.value * ratio.value + 10) * lv) - 20;// 10 is gap between card, 20 is margin left and right
+    gridColumns.value = `repeat(${lv}, ${widthCard.value})`;
 
-
-    gridColumns.value = `repeat(${route.params.level}, ${widthCard.value})`;
-})
-onMounted(() => {
     playSound("audioBackground");
-
 })
+
 const update = () => {
     elapsed.value = performance.now() - lastTime.value
     if (elapsed.value >= duration.value) {
@@ -96,6 +89,7 @@ reset()
 
 onUnmounted(() => {
     cancelAnimationFrame(handle.value)
+    pauseSound("audioBackground");
 })
 
 const createPokemon = (length) => {
@@ -125,6 +119,8 @@ const createPokemon = (length) => {
     return finalList;
 };
 const toggleCard = (index) => {
+    showResult('You win');
+    return;
     const selectedCard = pokemons.value[index];
     // Check if the card is already flipped or matched
     if (!selectedCard.isFlipped || flippedCards.value.length >= 2) {
@@ -158,14 +154,16 @@ const showResult = (message) => {
         rankPoints.splice(10);
         localStorage.setItem(key, JSON.stringify(rankPoints));
     }
-    routers.replace({ name: 'Result', params: { message: message, point: point } });
+    localStorage.setItem('point', point);
+    localStorage.setItem('message', message);
+    routers.replace({ name: 'Result' });
 };
 const playSound = (id) => {
     var playSoundStorage = localStorage.getItem('playSound');
-    if (playSoundStorage == "false")
+    if (playSoundStorage === "false")
         return;
     var audio = document.getElementById(id);
-    audio?.play();
+    audio.play();
 }
 const pauseSound = (id) => {
     var playSoundStorage = localStorage.getItem('playSound');
@@ -182,19 +180,18 @@ const checkForMatch = () => {
         // Match found, update show property to prevent further interactions with the matched cards
         card1.isFlipped = false;
         card2.isFlipped = false;
-        card1.isSelected = false;
-        card2.isSelected = false;
+
     } else {
         playSound("audioToggleFail")
         // No match, flip the cards back after a short delay
         setTimeout(() => {
             card1.isFlipped = true;
             card2.isFlipped = true;
-            card1.isSelected = false;
-            card2.isSelected = false;
+
         }, 500);
     }
-
+    card1.isSelected = false;
+    card2.isSelected = false;
     // Clear the flipped cards array
     flippedCards.value = [];
 };

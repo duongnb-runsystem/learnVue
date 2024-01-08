@@ -7,7 +7,7 @@ import router from '@/router';
 import congratulationAnimation from '@/assets/congratulationAnimation.json'
 
 const route = useRoute();
-const message = ref(route.params.message)
+const message = ref()
 const animation = ref()
 const point = ref()
 const watchPoint = reactive({
@@ -17,10 +17,10 @@ const intervalCountDown = ref()
 const countDownTime = ref(10);
 
 onBeforeMount(() => {
+    message.value = localStorage.getItem('message');
+    point.value = localStorage.getItem('point');
     animation.value = congratulationAnimation
-    setTimeout(() => {
-        point.value = route.params.point
-    }, 0)
+
     intervalCountDown.value = setInterval(() => {
         countDownTime.value--;
         if (countDownTime.value == 0) {
@@ -63,27 +63,31 @@ const playSound = (id) => {
         <source src="@/assets/sound/soundLose.mp3" type="audio/mpeg">
     </audio>
     <div class="parent-container">
-        <div class="div-container-center">
+        <div class="c-message-point">
             <h1>{{ message }}</h1>
             <h1>{{ watchPoint.number.toFixed(0) }}</h1>
         </div>
         <Vue3Lottie v-if="message === 'You win'" :height="500" :animationData="animation" :width="700" :loop="true"
             :speed="1" :autoPlay="true" />
     </div>
-    <p>Go To Home Screen After : {{ countDownTime }}</p>
-    <div class="div-button-level">
-        <ButtonCustom style="height: 70px;" label="Go Home" @click="startAgain()" />
+    <div class="c-center">
+        <p>Go To Home Screen After : {{ countDownTime }}</p>
+        <ButtonCustom class="btn-goBack" label="Go Home" @click="startAgain()" />
     </div>
 </template>
 
 <style scoped>
+.btn-goBack {
+    height: 50px;
+}
+
 .parent-container {
     position: relative;
     width: 100vw;
     height: 500px;
 }
 
-.div-container-center {
+.c-message-point {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -91,7 +95,7 @@ const playSound = (id) => {
     z-index: 1;
 }
 
-.div-container-center h1 {
+.c-message-point h1 {
     margin: 0;
     font-size: 7rem;
 }

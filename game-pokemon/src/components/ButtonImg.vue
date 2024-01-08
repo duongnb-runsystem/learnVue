@@ -15,6 +15,8 @@ const props = defineProps({
     flex-direction: column;
     align-items: center;
     border-radius: 25px;
+    margin-top: 15px;
+    margin-left: 10px;
     border: 2px solid #EE9d9d;
     width: 100px;
     height: 100px;

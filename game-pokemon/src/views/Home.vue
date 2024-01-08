@@ -16,6 +16,7 @@ onMounted(() => {
     playSound.value = localStorage.getItem('playSound') == "true";
 })
 const selectLevel = (index) => {
+    localStorage.setItem('level', buttons.value[index].param);
     router.push({ name: 'Game', params: { level: buttons.value[index].param } });
 }
 const toggleSound = () => {
@@ -27,7 +28,7 @@ const toggleRank = () => {
 }
 </script>
 <template>
-    <div class="div-container-center">
+    <div class="c-center">
         <h1>Poke Memories</h1>
         <p>Select mode to start game</p>
         <div class="div-button-level">
@@ -35,8 +36,8 @@ const toggleRank = () => {
                 @click="selectLevel(index)" />
         </div>
         <div class="div-button-level">
-            <ButtonImg :img=srcPlaySound style="margin-top: 20px;margin-right:10px;" @click="toggleSound" />
-            <ButtonImg :img="'img/ranking.svg'" style="margin-top: 20px;" @click="toggleRank" />
+            <ButtonImg :img=srcPlaySound @click="toggleSound" />
+            <ButtonImg :img="'img/ranking.svg'" @click="toggleRank" />
         </div>
     </div>
 </template>
