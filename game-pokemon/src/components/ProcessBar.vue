@@ -24,6 +24,6 @@ const props = defineProps({
     align-items: center;
     background-color: #e0e0de;
     border-radius: 50px;
-    /* margin: 30px; */
+    margin: 30px;
 }
 </style>
