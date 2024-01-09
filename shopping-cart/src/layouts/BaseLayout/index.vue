@@ -7,16 +7,7 @@
 <template>
   <div class="base-layout">
     <header>
-      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-      <div class="wrapper">
-        <div>Base layout</div>
-
-        <nav>
-          <RouterLink to="/">Home</RouterLink>
-          <RouterLink to="/about">About</RouterLink>
-        </nav>
-      </div>
+      <div style="height: 200px;"></div>
     </header>
     <div class="layout-root">
       <router-view></router-view>

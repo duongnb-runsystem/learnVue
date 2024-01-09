@@ -1,82 +1,81 @@
 <script setup>
+import service from '@/services/axios.service.js';
+
 import axios from 'axios';
-import { ref } from 'vue';
-import DetailProduct from '@/components/DetailProduct.vue';
-const data = ref(null);
+import { ref, computed } from 'vue';
+import DetailProduct from '@/components/product/DetailProduct.vue';
+import ListProduct from '@/components/product/ListProduct.vue';
+
+
+const menu = ref(null);
 const nameProduct = ref(null);
 const priceProduct = ref(null);
 const imgProduct = ref(null);
 const descriptionProduct = ref(null);
+const showDetail = ref(false);
+const priceDiscount = ref();
+const searchTerm = ref('')
 
-const instance = axios.create({
-  headers: {
-    'x-foody-client-type': '1',
-    'x-foody-client-id': '',
-    'x-foody-client-language': 'vi',
-    'x-foody-client-version': '3.0.0',
-    'x-foody-access-token': '',
-    'x-foody-api-version': '1',
-    'x-foody-app-type': '1004'
-  }
-
-})
+const getDeliveryUrl = (url) => {
+  var rs = url.replace("https://shopeefood.vn/", "");
+  return rs;
+}
 const getData = async () => {
-  // url quan
-  //https://shopeefood.vn/ho-chi-minh/phuc-long-cong-hoa
-  //get id quan
-  var url = await instance.get('api/delivery/get_from_url?url=ho-chi-minh/phuc-long-cong-hoa')
-  console.log(url);
-  const res = await instance.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${url.data.reply.delivery_id}`);
-  data.value = res.data.reply.menu_infos;
-  console.log(res.data.reply);
+  // url shop
+  var urlShop = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
+  //get id shop
+  var deliveryUrl = getDeliveryUrl(urlShop);
+  console.log("deliver url :" + deliveryUrl);
+  var rsIdShop = await service.get(`api/delivery/get_from_url?url=${deliveryUrl}`);
+  var idShop = rsIdShop.data.reply.delivery_id;
+  console.log("id shop:" + rsIdShop.data.reply.delivery_id);
+  //get menu
+  const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${idShop}`);
+  console.log(res);
+  menu.value = res.data.reply.menu_infos;
+  console.log(menu.value);
 }
 getData();
-const showDetail = ref(false);
-const showDetailClick = (index, indexChild) => {
 
-  var itemchild = data.value[index].dishes[indexChild];
+const showDetailClick = (categoryIndex, itemIndex) => {
+  console.log("index emit compoment parent" + categoryIndex + ' ' + itemIndex);
+  var itemchild = menu.value[categoryIndex].dishes[itemIndex];
 
-  console.log(index, indexChild);
+  // console.log(index, indexChild);
   showDetail.value = true;
   nameProduct.value = itemchild.name;
   priceProduct.value = itemchild.price.text;
-  imgProduct.value = itemchild.photos[2].value;
+  imgProduct.value = itemchild.photos[3].value;
   descriptionProduct.value = itemchild.description;
-  console.log(itemchild.description);
-  console.log(nameProduct.value + priceProduct.value + imgProduct.value);
+  priceDiscount.value = menu.value[categoryIndex]?.is_group_discount === true ? itemchild.discount_price.text : "-1";
 }
+
 </script>
 
 <template>
-  <main>
-
-    <div v-for="(item, index) in data">
-      <h2>{{ item.dish_type_name }}</h2>
-      <div v-for="(itemChild, indexChild) in item.dishes" style="display: flex;"
-        @click="showDetailClick(index, indexChild)">
-        <img :src="itemChild.photos[1].value">
-        <div style="margin-left: 10px;">
-          <h3>
-            {{ itemChild.name }} - {{ itemChild.price.text }}
-          </h3>
-          <p>
-            {{ itemChild.description }}
-          </p>
+  <div class="col-content">
+    <div class="left">
+      <div class="left-content">
+        <h1>Menu</h1>
+        <div class="left-menu">
+          <h3 v-for="item in menu">{{ item.dish_type_name }}</h3>
         </div>
-
-
       </div>
     </div>
-    <Teleport to="body">
-      <!-- use the modal component, pass in the prop -->
-      <DetailProduct :show="showDetail" @close="showDetail = false" :name="nameProduct" :price="priceProduct"
-        :img="imgProduct" :description="descriptionProduct">
-        <template #header>
-          <h3>custom header</h3>
-        </template>
-      </DetailProduct>
-    </Teleport>
-  </main>
+    <div class="col-content-center">
+      <input class="f-search" v-model="searchTerm" placeholder="Search...">
+      <ListProduct :menu="menu" :querry="searchTerm" @showDetailEmit="showDetailClick"></ListProduct>
+    </div>
+    <div class="col-content-right">
+      <h1>qr</h1>
+    </div>
+  </div>
+  <Teleport to="body">
+    <!-- use the modal component, pass in the prop -->
+    <DetailProduct :show="showDetail" @close="showDetail = false" :name="nameProduct" :price="priceProduct"
+      :img="imgProduct" :description="descriptionProduct" :priceDiscount="priceDiscount">
+    </DetailProduct>
+  </Teleport>
 </template>
 
 <style scoped lang="scss">
