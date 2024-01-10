@@ -1,27 +1,29 @@
 <script setup>
 import { defineProps } from 'vue'
 const prop = defineProps({
-    name: String,
-    description: String,
-    price: String,
-    img: String,
+    item: Object,
     show: Boolean,
-    priceDiscount: String
+
 })
 </script>
 <template>
     <Transition name="modal">
         <div v-if="show" class="modal-mask">
             <div class="modal-container">
-                <img :src="img" />
-                <div class="c-infor">
-                    <h1>{{ name }}</h1>
-                    <p>{{ description }}</p>
-                    <h3>{{ price }}</h3>
-                    <h3 v-if="priceDiscount != `-1`">{{ priceDiscount }}</h3>
+                <img :src="item.photos[3].value" />
+                <div class="c-content">
+                    <div class="c-info">
+                        <h1>{{ item.name }}</h1>
+                        <p>{{ item.description }}</p>
+                    </div>
+                    <div class="c-price">
+                        <h3 class="lb-price" :class="{ isDiscount: item?.discount_price?.text }">{{ item.price.text }}</h3>
+                        <h3 class="lb-price">{{ item?.discount_price?.text }}</h3>
+                    </div>
                 </div>
+
                 <div class="col-btn">
-                    <button class="btn-add" @click="$emit('close')">+ Add</button>
+                    <button class="btn-add" @click="$emit('addCart', item)">+ Add</button>
                     <button class="btn-cancel" @click="$emit('close')">Cancel</button>
                 </div>
             </div>
@@ -54,11 +56,37 @@ const prop = defineProps({
         width: 100%;
     }
 
-    .c-infor {
-        padding: 0px 20px 0px 20px;
+    .c-content {
+        display: flex;
+        padding-left: 10px;
 
-        h3 {
+        .c-infor {
+            display: flex;
+            margin-left: 10px;
+        }
+
+        .c-price {
+            margin-top: auto;
+            margin-bottom: auto;
+            position: relative;
             text-align: right;
+            justify-content: center;
+            align-items: center;
+            padding-right: 10px;
+
+            .lb-price {
+                font-size: 20px;
+                font-weight: bold;
+                margin-top: 0;
+                margin-bottom: 0;
+                color: #ee4d2d;
+            }
+
+            .isDiscount {
+                color: #888888;
+                font-size: 15px;
+                text-decoration: line-through;
+            }
         }
     }
 
@@ -70,7 +98,7 @@ const prop = defineProps({
         .btn-add {
             width: 100px;
             height: 40px;
-            background-color: #42b983;
+            background-color: #ee4d2d;
             border: none;
             border-radius: 5px;
             color: #fff;
@@ -83,18 +111,30 @@ const prop = defineProps({
             width: 100px;
             height: 40px;
             background-color: #fff;
-            border: 1px solid #42b983;
+            border: 1px solid #ee4d2d;
             border-radius: 5px;
-            color: #42b983;
+            color: #ee4d2d;
             font-size: 16px;
             font-weight: bold;
+        }
+
+        .btn-add:focus,
+        .btn-cancel:focus {
+            outline: none;
+            border: 1px solid #ee4d2d
         }
     }
 }
 
+.isDiscount {
+    color: #888888;
+    font-size: 15px;
+    text-decoration: line-through;
+}
+
 .modal-header h3 {
     margin-top: 0;
-    color: #42b983;
+    color: #ee4d2d;
 }
 
 .modal-body {

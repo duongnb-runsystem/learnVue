@@ -1,50 +1,59 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
 const props = defineProps({
+    id: String,
     menu: Array,
     querry: String
 })
 
-const emit = defineEmits(['showDetailEmit']);
-
-const handleClick = (categoryIndex, itemIndex) => {
-    console.log("index emit compoment" + categoryIndex + ' ' + itemIndex);
-    emit('showDetailEmit', categoryIndex, itemIndex);
+const emit = defineEmits(['showDetailEmit', 'addCart', 'subCart']);
+const scrollToItem = (item) => {
+    var element = document.getElementById(item);
+    element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 }
 </script>
 <template>
-    <div v-for="(category, categoryIndex) in menu">
+    <div :id="category.dish_type_name" v-for="(category, categoryIndex) in menu">
         <h1>{{ category.dish_type_name }}</h1>
-        <div class="item-menu" v-for="(item, itemIndex) in category.dishes" @click="handleClick(categoryIndex, itemIndex)">
-            <img :src="item.photos[1].value">
-            <div class="c-infor">
-                <h3>{{ item.name }}</h3>
-                <p>{{ item.description }}</p>
+        <div class="item-menu" v-for="(item, itemIndex) in category.dishes">
+            <div class="c-content" @click="emit('showDetailEmit', item)">
+                <img :src="item.photos[1].value">
+                <div class="c-infor">
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.description }}</p>
+                </div>
+                <div class="c-price">
+                    <h3 class="lb-price" :class="{ isDiscount: category?.is_group_discount ?? false }">
+                        {{ item.price.text }}
+                    </h3>
+                    <h3 class="lb-price" v-if="category?.is_group_discount === true ?? false">
+                        {{ item.discount_price.text }}
+                    </h3>
+                </div>
             </div>
-            <div class="c-price">
-                <h3 class="lb-price" :class="{ isDiscount: category?.is_group_discount ?? false }">
-                    {{ item.price.text }}
-                </h3>
-                <h3 class="lb-price" v-if="category?.is_group_discount === true ?? false">
-                    {{ item.discount_price.text }}
-                </h3>
+            <div class="c-quantity">
+                <div class="btn-update" @click="emit('subCart', item)">-</div>
+                <p class="">{{ item.quantity }}</p>
+                <div class="btn-update" @click="emit('addCart', item)">+</div>
             </div>
-            <div class="btn-adding">+</div>
         </div>
     </div>
 </template>
 <style scoped lang="scss">
-.item-menu {
+.c-quantity {
     display: flex;
-    background-color: #fff;
-    border-radius: 15px;
-    margin-bottom: 10px;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
-    cursor: pointer;
+    justify-content: center;
 
-    .btn-adding {
+    p {
+        font-size: 20px;
+        width: 30px;
+        margin-top: auto;
+        margin-bottom: auto;
+        text-align: center;
+        margin-right: 10px;
+    }
+
+    .btn-update {
         font-size: 22px;
         cursor: pointer;
         font-weight: 700;
@@ -58,11 +67,40 @@ const handleClick = (categoryIndex, itemIndex) => {
         justify-content: center;
         background-color: #ee4d2d;
         color: #fff;
-
     }
 
+}
+
+.item-menu {
+    display: flex;
+    background-color: #fff;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+
+    .c-content {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+        cursor: pointer;
+    }
+
+    .c-price {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-left: auto;
+        gap: 5px;
+    }
+
+
+
     .lb-price {
-        color: rgb(40, 180, 255);
+        color: #ee4d2d;
         font-size: 20px;
     }
 
@@ -73,7 +111,8 @@ const handleClick = (categoryIndex, itemIndex) => {
     }
 
     .c-infor {
-        width: 65%;
+        width: 60%;
+        margin-left: 10px;
     }
 
     img {
