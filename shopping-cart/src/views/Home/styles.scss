@@ -1,23 +1,17 @@
 .col-content {
     display: grid;
     background-color: rgb(242, 242, 242);
-    grid-template-columns: 1fr 1.7fr 1fr;
+    grid-template-columns: 500px 1.7fr 1fr;
 
     .col-left {
+        position: relative;
         text-align: right;
-        margin-left: auto;
         margin-right: 20px;
+        margin-top: 10px;
+        align-items: right;
+        justify-content: right;
 
-        .left-content {
-            width: 250px;
-            background-color: #fff;
-            border-radius: 15px;
-            margin-top: 10px;
-            padding: 10px 20px;
-            align-items: right;
-            justify-content: right;
-            text-align: left;
-        }
+
     }
 
     .center-content {
@@ -25,6 +19,10 @@
 
         .f-search {
             width: 100%;
+            height: 40px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding-left: 10px;
         }
 
         h2 {
@@ -41,11 +39,9 @@
     }
 
     .col-right {
-
+        position: relative;
         text-align: left;
         margin-left: 20px;
         margin-right: auto;
-
-
     }
 }

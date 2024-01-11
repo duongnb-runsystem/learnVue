@@ -1,5 +1,6 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+const isCollaps = ref(false);
 const props = defineProps({
     data: Object,
 })
@@ -13,39 +14,141 @@ const sumCart = computed(() => {
 const sumPrice = computed(() => {
     let sum = 0;
     props.data.forEach(item => {
-        if (item?.discount_price?.text) {
-            sum += item.discount_price.value * item.quantity;
-        }
-        else {
-            sum += item.price.value * item.quantity;
-        }
+        sum += item.price.value * item.quantity;
     });
     return formatVND(sum);
 })
 const formatVND = (value) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 };
-const emit = defineEmits(['removeCart']);
+const emit = defineEmits(['removeCart', 'orderCart']);
+const totalPrice = computed(() => {
+    let sum = 0;
+    props.data.forEach(item => {
+        sum += item.price.value * item.quantity;
+    });
+    sum += 15000;
+    return formatVND(sum);
+})
+
+const isSortAtoZ = ref(true);
+const scrSort = ref();
+const changeSort = () => {
+    isSortAtoZ.value = !isSortAtoZ.value;
+    scrSort.value = isSortAtoZ ? "arrow-down-a-z" : "arrow-down-z-a"
+    props.data.sort((a, b) => {
+        if (isSortAtoZ.value)
+            return a.quantity - b.quantity;
+        else
+            return b.quantity - a.quantity;
+    });
+}
 </script>
 <template>
     <div class="c-content" v-if="data.length">
-        <h1>Cart</h1>
-        <div class="c-cart" v-for="item in data">
-            <img class="i-thumb" :src="item.photos[1].value" />
-            <p class="name">{{ item.name }}</p>
-            <p class="quantity">{{ item.quantity }}</p>
-            <div class="btn-quatity remove" @click="emit('removeCart', item)">x</div>
+        <div class="c-header">
+            <h1 @click="sortCart()">Giỏ hàng</h1>
+            <p class="lb-cart" v-if="isCollaps">{{ sumCart }} </p>
+            <font-awesome-icon class="fa-sort" v-if="!isCollaps" @click="changeSort" icon="sort" />
+            <font-awesome-icon class="fa-collap" :class="{ rotated: isCollaps }" icon="chevron-up"
+                @click="isCollaps = !isCollaps" />
         </div>
-        <div class="c-sum">
-            <p>Số lượng {{ sumCart }} ~ {{ sumPrice }}</p>
-        </div>
-        <div class="btn-order">
-            Order
+        <div class="collapsible" :class="{ collapCart: !isCollaps }">
+            <div class="c-cart" v-for="  item   in    data   ">
+                <img class="i-thumb" :src="item.photos[1].value" />
+                <p class="name">{{ item.name }}</p>
+                <p class="quantity">{{ item.quantity }}</p>
+                <div class="btn-quatity remove" @click="emit('removeCart', item)">x</div>
+            </div>
+            <div class="c-priceShip">
+                <p class="lb-titlePrice"> Tổng cộng ({{ sumCart }} món)</p>
+                <p class="lb-price">{{ sumPrice }}</p>
+            </div>
+            <p>Địa chỉ : Số 2 Hồng Hà, phường 2, Tân Bình, TP.HCM</p>
+            <div class="c-priceShip">
+                <p class="lb-titlePrice">Phí giao hàng(0.2km) </p>
+                <p class="lb-price">{{ formatVND(15000) }}</p>
+            </div>
+            <div class="c-priceShip">
+                <p class="lb-titlePrice">Tổng cộng </p>
+                <p class="lb-price">{{ totalPrice }}</p>
+            </div>
+            <div class="btn-order" @click="emit('orderCart')">
+                Đặt hàng ({{ totalPrice }})
+            </div>
         </div>
     </div>
 </template>
 <style scoped lang="scss">
+.fa-sort {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+}
+
+.fa-sort:hover {
+    color: #ee4d2d;
+    border: 1px solid #ee4d2d;
+}
+
+.lb-cart {
+    margin-left: 10px;
+    color: #fff;
+    font-weight: 700;
+    background-color: #ee4d2d;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.c-title-cart {
+    position: relative;
+}
+
+.fa-collap {
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.rotated {
+    transform: rotate(180deg);
+}
+
+.c-header {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.c-priceShip {
+    justify-content: space-between;
+    display: flex;
+    align-items: right;
+    text-align: right;
+}
+
+.lb-titlePrice {
+    font-weight: 700;
+}
+
+.lb-price {
+    font-weight: 700;
+    color: #ee4d2d;
+}
+
 .c-content {
+    top: 0;
     width: 450px;
     background-color: #fff;
     border-radius: 15px;
@@ -71,22 +174,32 @@ const emit = defineEmits(['removeCart']);
     cursor: pointer;
 }
 
-.c-sum {
-    display: flex;
-    justify-content: right;
-    align-items: right;
-    text-align: right;
+.collapsible {
+    height: 0;
+    transition: height 0.5s ease-out;
+    overflow: hidden;
+    transition: height 0.5s ease-out;
+    visibility: hidden;
+    transition: visibility 0.5s ease-out;
+
+}
+
+.collapCart {
+    height: auto;
+    visibility: visible;
 }
 
 .c-cart {
     background-color: rgb(242, 242, 242);
     border-radius: 5px;
     margin-top: 10px;
+    margin-bottom: 10px;
     display: flex;
     justify-content: left;
     gap: 10px;
     height: 50px;
     width: 100%;
+
 
     .name {
         width: 70%;

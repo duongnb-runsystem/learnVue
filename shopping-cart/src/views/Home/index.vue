@@ -16,23 +16,47 @@ const dataCategory = ref([]);
 const listProduct = ref(null);
 const itemDetail = ref(null);
 
+
 const getDeliveryUrl = (url) => {
-  var rs = url.replace("https://shopeefood.vn/", "");
+  let rs = url.replace("https://shopeefood.vn/", "");
   return rs;
 }
+onMounted(() => {
+  // get cart from local storage
+  const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart'));
+  if (cartFromLocalStorage) {
+    cart.value = cartFromLocalStorage;
+  }
+});
 const getData = async () => {
   // url shop
-  var urlShop = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
+  let urlShop = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
   //get id shop
-  var deliveryUrl = getDeliveryUrl(urlShop);
-  var rsIdShop = await service.get(`api/delivery/get_from_url?url=${deliveryUrl}`);
-  var idShop = rsIdShop.data.reply.delivery_id;
+  let deliveryUrl = getDeliveryUrl(urlShop);
+  let rsIdShop = await service.get(`api/delivery/get_from_url?url=${deliveryUrl}`);
+  let idShop = rsIdShop.data.reply.delivery_id;
   //get menu
   const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${idShop}`);
-  menu.value = res.data.reply.menu_infos;
+  console.log(res);
+
+  menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
+  //update data quantity from cart to menu
+  menu.value.forEach(itemMenu => {
+    itemMenu.dishes.forEach(itemDish => {
+      let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
+      if (existItem) {
+        itemDish.quantity = existItem.quantity;
+      }
+    });
+  });
+  console.log('log review')
+  console.log(menu.value);
+  console.log(cart.value);
+
   menu.value.forEach(item => {
     dataCategory.value.push(item.dish_type_name);
   });
+
 }
 getData();
 
@@ -40,58 +64,103 @@ const showDetailClick = (item) => {
   itemDetail.value = item;
   showDetail.value = true;
 }
-
+const saveCartToLocalStorage = () => {
+  localStorage.setItem('cart', JSON.stringify(cart.value));
+}
 const addProduct = (item) => {
   showDetail.value = false;
   // Check if the item already exists in the cart
-  var existItem = cart.value.find((itemCart) => itemCart.id === item.id);
-
+  let existItem = cart.value.find((itemCart) => itemCart.id === item.id);
+  console.log(existItem);
   if (existItem) {
     // If the item already exists, increase its quantity by 1
     existItem.quantity++;
+    // syns quantity to item of category
+    menu.value.forEach(itemMenu => {
+      itemMenu.dishes.forEach(itemDish => {
+        if (itemDish.id === item.id) {
+          itemDish.quantity = existItem.quantity;
+        }
+      });
+    });
+    // save cart to local storage
+    saveCartToLocalStorage();
   } else {
     // If the item does not exist, set its quantity to 1 and add it to the cart
     item.quantity = 1;
     cart.value.push(item);
+    // save cart to local storage
+    saveCartToLocalStorage();
   }
 }
+
 const subProduct = (item) => {
-  var existItem = cart.value.find((itemCart) => itemCart.id === item.id);
+  let existItem = cart.value.find((itemCart) => itemCart.id === item.id);
   if (existItem) {
     existItem.quantity--;
+    // syns quantity to item of category
+    menu.value.forEach(itemMenu => {
+      itemMenu.dishes.forEach(itemDish => {
+        if (itemDish.id === item.id) {
+          itemDish.quantity = existItem.quantity;
+        }
+      });
+    });
     if (existItem.quantity === 0) {
       cart.value = cart.value.filter((itemCart) => itemCart.id !== item.id);
     }
+    saveCartToLocalStorage();
   }
 }
 
 const removeCartClick = (item) => {
+  console.log(item);
   item.quantity = 0;
+  menu.value.forEach(itemMenu => {
+    itemMenu.dishes.forEach(itemDish => {
+      if (itemDish.id === item.id) {
+        itemDish.quantity = 0;
+      }
+    });
+  })
   cart.value = cart.value.filter((itemCart) => itemCart.id !== item.id);
+
+  saveCartToLocalStorage();
 }
+
 const scrollCategory = (item) => {
-  $refs.listProduct.scrollToItem(item);
+  listProduct.value.scrollToItem(item);
+}
+
+const orderCart = () => {
+  alert("Đặt hàng thành công");
+  console.log(cart.value);
+  cart.value.forEach(item => {
+    item.quantity = 0;
+  });
+  menu.value.forEach(itemMenu => {
+    itemMenu.dishes.forEach(itemDish => {
+      itemDish.quantity = 0;
+    });
+  })
+  cart.value = [];
+  saveCartToLocalStorage();
 }
 </script>
 
 <template>
-  <div class="col-content">
+  <div class="col-content" v-if="menu">
     <div class="col-left">
-      <div class="left-content">
-        <h1>Menu</h1>
-        <ListMenu :data="dataCategory" @scrollCategory="scrollCategory"></ListMenu>
-      </div>
+      <ListMenu :data="dataCategory" @scrollCategory="scrollCategory"></ListMenu>
     </div>
     <div class="center-content">
-      <input class="f-search" v-model="searchTerm" placeholder="Search...">
+      <input class="f-search" v-model="searchTerm" placeholder="Tìm Món ...">
       <ListProduct ref="listProduct" :menu="menu" :querry="searchTerm" @showDetailEmit="showDetailClick"
         @addCart="addProduct" @subCart="subProduct">
       </ListProduct>
     </div>
     <div class="col-right">
-      <div class="right-content">
-        <ListCart :data="cart" @removeCart="removeCartClick"></ListCart>
-      </div>
+      <ListCart :data="cart" @removeCart="removeCartClick" @orderCart="orderCart"></ListCart>
     </div>
   </div>
   <Teleport to="body">

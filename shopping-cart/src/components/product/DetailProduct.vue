@@ -3,7 +3,6 @@ import { defineProps } from 'vue'
 const prop = defineProps({
     item: Object,
     show: Boolean,
-
 })
 </script>
 <template>
@@ -17,8 +16,8 @@ const prop = defineProps({
                         <p>{{ item.description }}</p>
                     </div>
                     <div class="c-price">
-                        <h3 class="lb-price" :class="{ isDiscount: item?.discount_price?.text }">{{ item.price.text }}</h3>
-                        <h3 class="lb-price">{{ item?.discount_price?.text }}</h3>
+                        <h3 class="lb-price">{{ item.price.text }}</h3>
+
                     </div>
                 </div>
 

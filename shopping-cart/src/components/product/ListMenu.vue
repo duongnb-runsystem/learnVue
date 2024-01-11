@@ -5,14 +5,29 @@ const props = defineProps({
 const emit = defineEmits(['scrollCategory']);
 </script>
 <template>
-    <div class="c-category" v-for="item in data" @click="emit('scrollCategory', item)">
-        <h3>{{ item }}</h3>
+    <div class="left-content">
+        <h1>Thực đơn</h1>
+        <div class="c-category" v-for="item in data" @click="emit('scrollCategory', item)">
+            <h3>{{ item }}</h3>
+        </div>
     </div>
 </template>
 <style scoped lang="scss">
+.left-content {
+    position: sticky;
+    top: 0;
+    width: 250px;
+    margin-left: 230px;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 10px 20px;
+    align-items: right;
+    justify-content: right;
+    text-align: left;
+}
+
 .c-category {
     display: flex;
-
     padding-left: 10px;
     margin-top: 10px;
 
