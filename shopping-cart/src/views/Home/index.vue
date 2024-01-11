@@ -37,7 +37,6 @@ const getData = async () => {
   let idShop = rsIdShop.data.reply.delivery_id;
   //get menu
   const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${idShop}`);
-  console.log(res);
 
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
   //update data quantity from cart to menu
@@ -49,9 +48,6 @@ const getData = async () => {
       }
     });
   });
-  console.log('log review')
-  console.log(menu.value);
-  console.log(cart.value);
 
   menu.value.forEach(item => {
     dataCategory.value.push(item.dish_type_name);
@@ -71,7 +67,6 @@ const addProduct = (item) => {
   showDetail.value = false;
   // Check if the item already exists in the cart
   let existItem = cart.value.find((itemCart) => itemCart.id === item.id);
-  console.log(existItem);
   if (existItem) {
     // If the item already exists, increase its quantity by 1
     existItem.quantity++;
@@ -114,7 +109,6 @@ const subProduct = (item) => {
 }
 
 const removeCartClick = (item) => {
-  console.log(item);
   item.quantity = 0;
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
@@ -134,7 +128,6 @@ const scrollCategory = (item) => {
 
 const orderCart = () => {
   alert("Đặt hàng thành công");
-  console.log(cart.value);
   cart.value.forEach(item => {
     item.quantity = 0;
   });

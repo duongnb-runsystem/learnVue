@@ -7,7 +7,6 @@ const props = defineProps({
 })
 const fillterData = computed(() => {
     if (props.querry) {
-        console.log(props.querry);
         let data = [];
         // find item in menu by querry
         props.menu.forEach(item => {
