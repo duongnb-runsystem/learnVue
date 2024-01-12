@@ -2,7 +2,8 @@ import { storeToRefs } from 'pinia'
 
 import app from '@/main'
 import * as store from '@/stores'
-
+import { registerRuntimeCompiler } from 'vue'
+import service from '@/services/axios.service'
 /**
  * Create instance router
  * Use in file *.js. If want to use function "handleRouter" in *.vue => /hooks/commom.ts
@@ -119,4 +120,33 @@ export const scrollToTop = () => {
     window.requestAnimationFrame(scrollToTop)
     window.scrollTo(0, target - target / 8)
   }
+
 }
+
+const getIdShopCommon = async () => {
+  let url = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
+  let deliveryUrl = url.replace("https://shopeefood.vn/", "");
+  let rsIdShop = await service.get(`api/delivery/get_from_url?url=${deliveryUrl}`);
+  return rsIdShop.data.reply.delivery_id;
+}
+const getDataDetailShopCommon = async () => {
+  var id = await getIdShopCommon();
+  const result = await service.get(`api/delivery/get_detail?id_type=2&request_id=${id}`);
+  return result.data.reply.delivery_detail;
+}
+const getDataShopCommon = async () => {
+  var id = await getIdShopCommon();
+  //get menu
+  const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${id}`);
+  return res;
+}
+
+
+
+
+
+const common = {
+  dataDetailShop: await getDataDetailShopCommon(),
+  dataShop: await getDataShopCommon(),
+}
+export default common;

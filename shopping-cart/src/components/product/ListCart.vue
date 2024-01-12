@@ -36,7 +36,7 @@ const scrSort = ref();
 const changeSort = () => {
     isSortAtoZ.value = !isSortAtoZ.value;
     scrSort.value = isSortAtoZ ? "arrow-down-a-z" : "arrow-down-z-a"
-    props.data.sort((a, b) => {
+    props.data.value = props.data.sort((a, b) => {
         if (isSortAtoZ.value)
             return a.quantity - b.quantity;
         else

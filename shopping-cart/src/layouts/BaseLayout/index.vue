@@ -1,22 +1,57 @@
 <script setup>
+import common from '@/core/utils/common.js';
+import service from '@/services/axios.service.js';
+
+import { ref, onMounted } from 'vue';
 /**
  * Layout: use for pages're logged
  */
+const address = ref(null);
+const kind = ref(null);
+const name = ref(null);
+const rattingCount = ref(null);
+const rattingStart = ref(null);
+const minOrder = ref(null);
+const maxOrder = ref(null);
+const urlImgThumb = ref(null);
+const isCallApi = ref(false);
+const phone = ref(null);
+onMounted(() => {
+  getData();
+});
+const formatVND = (value) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+};
+const getData = async () => {
+  let data = common.dataDetailShop;
+  //get detail shop for header
+
+  address.value = data.address;
+  name.value = data.name;
+  kind.value = data.categories[0];
+  rattingCount.value = data.rating.display_total_review;
+  minOrder.value = formatVND(data.price_range.min_price);
+  maxOrder.value = formatVND(data.price_range.max_price);
+  rattingStart.value = parseInt(data.rating.avg.toFixed());
+  urlImgThumb.value = data.photos[9].value;
+  phone.value = data.phones[0];
+  isCallApi.value = true;
+}
 </script>
 
 <template>
   <div class="base-layout">
     <header>
-      <div class="c-hearder-banner">
-        <img class="img-banner"
-          src="https://images.foody.vn/res/g70/693694/prof/s640x400/image-1d85bd0c-231130145509.jpeg" />
+      <div class="c-hearder-banner" v-if="isCallApi">
+        <img class="img-banner" :src="urlImgThumb" />
         <div class="c-hearder-infor">
-          <p class="kind-restaurant">CAFÉ/DESSERT</p>
-          <h1 class="name-restautant">Highlands Coffee - 58E Bạch Đằng</h1>
-          <p class="add-restautant">58E Bạch Đằng, P. 2, Tân Bình, TP. HCM</p>
+          <p class="kind-restaurant">{{ kind }}</p>
+          <h1 class="name-restautant">{{ name }}</h1>
+          <p class="add-restautant">{{ address }}</p>
+          <p class="add-restautant">SĐT: {{ phone }}</p>
           <div class="rating">
-            <font-awesome-icon v-for="item in 5" class="start" :icon="['fas', 'star']" />
-            <span class="countRate"> 999+</span>
+            <font-awesome-icon v-for="item in rattingStart" class="start" :icon="['fas', 'star']" />
+            <span class="countRate"> {{ rattingCount }}</span>
             đánh giá trên ShopeeFood
           </div>
           <a href="https://foody.vn/ho-chi-minh/highlands-coffee-bach-dang" rel="noopener noreferrer nofollow"
@@ -24,7 +59,7 @@
           <p><span class="sttOpen">● Mở cửa</span> - <span class="timeOpen">🕖 07:00 ~ 22:00</span></p>
           <div class="const-restaurant">
             <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
-            <span> 40,000 - 70,000</span>
+            <span> {{ minOrder }} ~ {{ maxOrder }}</span>
           </div>
         </div>
       </div>

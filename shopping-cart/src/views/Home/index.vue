@@ -1,12 +1,13 @@
 <script setup>
 import service from '@/services/axios.service.js';
-
+import common from '@/core/utils/common.js';
 import axios from 'axios';
 import { ref, computed, onMounted } from 'vue';
 import DetailProduct from '@/components/product/DetailProduct.vue';
 import ListProduct from '@/components/product/ListProduct.vue';
 import ListCart from '@/components/product/ListCart.vue';
 import ListMenu from '@/components/product/ListMenu.vue';
+import OrderCart from '@/components/product/OrderCart.vue';
 
 const menu = ref(null);
 const showDetail = ref(false);
@@ -15,31 +16,19 @@ const cart = ref([])
 const dataCategory = ref([]);
 const listProduct = ref(null);
 const itemDetail = ref(null);
+const showOrderCart = ref(false);
 
+const getData = async () => {
+  const res = common.dataShop;
+  menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
 
-const getDeliveryUrl = (url) => {
-  let rs = url.replace("https://shopeefood.vn/", "");
-  return rs;
-}
-onMounted(() => {
-  // get cart from local storage
+  // get data cart from local storage
   const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart'));
   if (cartFromLocalStorage) {
     cart.value = cartFromLocalStorage;
-  }
-});
-const getData = async () => {
-  // url shop
-  let urlShop = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
-  //get id shop
-  let deliveryUrl = getDeliveryUrl(urlShop);
-  let rsIdShop = await service.get(`api/delivery/get_from_url?url=${deliveryUrl}`);
-  let idShop = rsIdShop.data.reply.delivery_id;
-  //get menu
-  const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${idShop}`);
 
-  menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
-  //update data quantity from cart to menu
+  }
+  // update data quantity from cart to menu
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
       let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
@@ -63,6 +52,15 @@ const showDetailClick = (item) => {
 const saveCartToLocalStorage = () => {
   localStorage.setItem('cart', JSON.stringify(cart.value));
 }
+const syncQuantityIntoMenu = (item) => {
+  menu.value.forEach(itemMenu => {
+    itemMenu.dishes.forEach(itemDish => {
+      if (itemDish.id === item.id) {
+        itemDish.quantity = item.quantity;
+      }
+    });
+  });
+}
 const addProduct = (item) => {
   showDetail.value = false;
   // Check if the item already exists in the cart
@@ -70,14 +68,7 @@ const addProduct = (item) => {
   if (existItem) {
     // If the item already exists, increase its quantity by 1
     existItem.quantity++;
-    // syns quantity to item of category
-    menu.value.forEach(itemMenu => {
-      itemMenu.dishes.forEach(itemDish => {
-        if (itemDish.id === item.id) {
-          itemDish.quantity = existItem.quantity;
-        }
-      });
-    });
+    syncQuantityIntoMenu(existItem);
     // save cart to local storage
     saveCartToLocalStorage();
   } else {
@@ -93,14 +84,7 @@ const subProduct = (item) => {
   let existItem = cart.value.find((itemCart) => itemCart.id === item.id);
   if (existItem) {
     existItem.quantity--;
-    // syns quantity to item of category
-    menu.value.forEach(itemMenu => {
-      itemMenu.dishes.forEach(itemDish => {
-        if (itemDish.id === item.id) {
-          itemDish.quantity = existItem.quantity;
-        }
-      });
-    });
+    syncQuantityIntoMenu(existItem);
     if (existItem.quantity === 0) {
       cart.value = cart.value.filter((itemCart) => itemCart.id !== item.id);
     }
@@ -110,13 +94,7 @@ const subProduct = (item) => {
 
 const removeCartClick = (item) => {
   item.quantity = 0;
-  menu.value.forEach(itemMenu => {
-    itemMenu.dishes.forEach(itemDish => {
-      if (itemDish.id === item.id) {
-        itemDish.quantity = 0;
-      }
-    });
-  })
+  syncQuantityIntoMenu(item);
   cart.value = cart.value.filter((itemCart) => itemCart.id !== item.id);
 
   saveCartToLocalStorage();
@@ -138,6 +116,7 @@ const orderCart = () => {
   })
   cart.value = [];
   saveCartToLocalStorage();
+  showOrderCart.value = false;
 }
 </script>
 
@@ -153,13 +132,15 @@ const orderCart = () => {
       </ListProduct>
     </div>
     <div class="col-right">
-      <ListCart :data="cart" @removeCart="removeCartClick" @orderCart="orderCart"></ListCart>
+      <ListCart :data="cart" @removeCart="removeCartClick" @orderCart="showOrderCart = true;"></ListCart>
     </div>
   </div>
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
     <DetailProduct :item="itemDetail" :show="showDetail" @close="showDetail = false" @addCart="addProduct">
     </DetailProduct>
+    <OrderCart :show="showOrderCart" :data="cart" @confirm="orderCart" @close="showOrderCart = false">
+    </OrderCart>
   </Teleport>
 </template>
 
