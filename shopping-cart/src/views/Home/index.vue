@@ -1,7 +1,5 @@
 <script setup>
-import service from '@/services/axios.service.js';
 import common from '@/core/utils/common.js';
-import axios from 'axios';
 import { ref, computed, onMounted } from 'vue';
 import DetailProduct from '@/components/product/DetailProduct.vue';
 import ListProduct from '@/components/product/ListProduct.vue';
@@ -17,7 +15,6 @@ const dataCategory = ref([]);
 const listProduct = ref(null);
 const itemDetail = ref(null);
 const showOrderCart = ref(false);
-
 onMounted(() => {
   console.log('mounted home');
   getData();
@@ -33,7 +30,6 @@ const getData = async () => {
 
   }
   // update data quantity from cart to menu
-
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
       let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
@@ -55,6 +51,7 @@ const showDetailClick = (item) => {
 }
 const saveCartToLocalStorage = () => {
   localStorage.setItem('cart', JSON.stringify(cart.value));
+
 }
 const syncQuantityIntoMenu = (item) => {
   menu.value.forEach(itemMenu => {

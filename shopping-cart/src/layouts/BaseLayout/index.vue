@@ -1,6 +1,5 @@
 <script setup>
 import common from '@/core/utils/common.js';
-import service from '@/services/axios.service.js';
 
 import { ref, onMounted } from 'vue';
 /**

@@ -1,5 +1,20 @@
 <template>
     <div class="c-container">
+        <div class="c-nowSearch">
+            <h1 class="title">Đặt Đồ ăn, giao hàng từ 20'...</h1>
+            <p class="local">có 77201 địa điểm ở TP. HCM từ 00:00 - 23:59</p>
+            <div class="c-input-search">
+                <input class="f-search" v-model="searchHome" placeholder="Tìm địa điểm, món ăn, địa chỉ...">
+                <div class="btn-search">
+                    <font-awesome-icon class="ic-search" icon="magnifying-glass" />
+                </div>
+            </div>
+            <div class="c-tag-search">
+                <div class="tag-search" v-for="item in tagSearch">
+                    <p>{{ item.display_text }}</p>
+                </div>
+            </div>
+        </div>
         <div class="f-login">
             <h1>Đăng nhập</h1>
             <input class="i-email" v-model="email" placeholder="Tên đăng nhập*" />
@@ -35,12 +50,14 @@
 import { onMounted, ref } from 'vue';
 import { useCounterStore } from '@/stores/counter';
 import router from '@/router/index';
-
+import service from '@/services/axios.service'
 const email = ref();
 const password = ref();
 const inValidateEmail = ref(false);
 const inValidatePassword = ref(false);
+const tagSearch = ref([]);;
 const loginClick = () => {
+
     router?.replace({ name: 'home' });
     return;
     if (email.value === 'admin' && password.value === 'admin') {
@@ -55,6 +72,11 @@ const loginClick = () => {
         }
     }
 }
+const getData = async () => {
+    let data = await service.get('/api/landing_page/get_web_footers_by_city_id?city_id=217');
+    tagSearch.value = data.data.reply.web_footer[3].children;
+}
+getData();
 </script>
 
 <style lang="scss">
