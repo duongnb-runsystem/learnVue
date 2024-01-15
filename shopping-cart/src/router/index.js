@@ -3,6 +3,11 @@ import checkAuth from './auth'
 
 const routes = [
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/Login/index.vue')
+  },
+  {
     path: '/',
     name: 'home',
     component: () => import('@/layouts/BaseLayout/index.vue'),
@@ -17,6 +22,7 @@ const routes = [
         name: 'about',
         component: () => import('@/views/About/index.vue')
       }
+
     ]
   }
 ]

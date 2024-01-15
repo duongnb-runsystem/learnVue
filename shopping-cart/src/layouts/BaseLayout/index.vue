@@ -17,6 +17,7 @@ const urlImgThumb = ref(null);
 const isCallApi = ref(false);
 const phone = ref(null);
 onMounted(() => {
+  console.log('mounted base layout');
   getData();
 });
 const formatVND = (value) => {

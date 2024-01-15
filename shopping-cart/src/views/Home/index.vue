@@ -18,10 +18,14 @@ const listProduct = ref(null);
 const itemDetail = ref(null);
 const showOrderCart = ref(false);
 
+onMounted(() => {
+  console.log('mounted home');
+  getData();
+});
 const getData = async () => {
   const res = common.dataShop;
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
-
+  console.log(menu.value);
   // get data cart from local storage
   const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart'));
   if (cartFromLocalStorage) {
@@ -29,6 +33,7 @@ const getData = async () => {
 
   }
   // update data quantity from cart to menu
+
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
       let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
@@ -37,13 +42,12 @@ const getData = async () => {
       }
     });
   });
-
   menu.value.forEach(item => {
     dataCategory.value.push(item.dish_type_name);
   });
 
 }
-getData();
+// getData();
 
 const showDetailClick = (item) => {
   itemDetail.value = item;
@@ -121,7 +125,7 @@ const orderCart = () => {
 </script>
 
 <template>
-  <div class="col-content" v-if="menu">
+  <div class="col-content">
     <div class="col-left">
       <ListMenu :data="dataCategory" @scrollCategory="scrollCategory"></ListMenu>
     </div>
