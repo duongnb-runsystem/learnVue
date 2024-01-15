@@ -6,7 +6,7 @@ import ListProduct from '@/components/product/ListProduct.vue';
 import ListCart from '@/components/product/ListCart.vue';
 import ListMenu from '@/components/product/ListMenu.vue';
 import OrderCart from '@/components/product/OrderCart.vue';
-
+import { useCartStore } from '@/stores/carts.js'
 const menu = ref(null);
 const showDetail = ref(false);
 const searchTerm = ref('')
@@ -20,6 +20,8 @@ onMounted(() => {
   getData();
 });
 const getData = async () => {
+  console.log('get data store')
+  console.log(useCartStore().getCarts);
   const res = common.dataShop;
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
   console.log(menu.value);
@@ -27,7 +29,6 @@ const getData = async () => {
   const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart'));
   if (cartFromLocalStorage) {
     cart.value = cartFromLocalStorage;
-
   }
   // update data quantity from cart to menu
   menu.value.forEach(itemMenu => {
@@ -51,7 +52,8 @@ const showDetailClick = (item) => {
 }
 const saveCartToLocalStorage = () => {
   localStorage.setItem('cart', JSON.stringify(cart.value));
-
+  useCartStore().setCarts(cart.value);
+  console.log(useCartStore().getCarts);
 }
 const syncQuantityIntoMenu = (item) => {
   menu.value.forEach(itemMenu => {

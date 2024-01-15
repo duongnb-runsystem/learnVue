@@ -5,14 +5,23 @@
             <p class="local">có 77201 địa điểm ở TP. HCM từ 00:00 - 23:59</p>
             <div class="c-input-search">
                 <input class="f-search" v-model="searchHome" placeholder="Tìm địa điểm, món ăn, địa chỉ...">
-                <div class="btn-search">
+                <div class="btn-search" @click="searchClick">
                     <font-awesome-icon class="ic-search" icon="magnifying-glass" />
                 </div>
             </div>
-            <div class="c-tag-search">
-                <div class="tag-search" v-for="item in tagSearch">
-                    <p>{{ item.display_text }}</p>
+            <div class="c-tab-category">
+                <div class="tab-category" v-for="item in categorySearch" @click="chooseTabCategory(item)">
+                    <span>{{ item.display_text }}</span>
+                    <div :class="{ isSelected: item.isSelected }"> </div>
                 </div>
+            </div>
+            <div class="c-tag-search">
+                <div class="tag-search" v-for="item in tagSearch" @click="chooseTagSearch(item)">
+                    <span>{{ item.display_text }}</span>
+                </div>
+            </div>
+            <div class="c-footer-search">
+                Sử dụng App ShopeeFood để có nhiều giảm giá và trải nghiệm tốt hơn
             </div>
         </div>
         <div class="f-login">
@@ -22,8 +31,8 @@
             <input class="i-email" type="password" v-model="password" placeholder="Mật khẩu*" />
             <p class="error" :class="{ inValidateForm: inValidatePassword }">Mật khẩu không đúng</p>
             <div class="c-function">
-                <div class="c-remember">
-                    <input type="checkbox" id="remember" name="remember" value="remember">
+                <div class="c-remember" @click="remember = !remember">
+                    <input type="checkbox" id="remember" v-model="remember">
                     <span>Ghi nhớ đăng nhập</span>
                 </div>
                 <div class="c-forgot">
@@ -35,11 +44,11 @@
                 Đăng nhập
             </div>
             <hr />
-            <div class="btn-login-google" @click="emit('loginGoogle')">
+            <div class="btn-login-google" @click="loginGoogle">
                 <img src="@/assets/images/icon-google.svg" />
                 Đăng nhập với Google
             </div>
-            <div class="btn-login-google" @click="emit('loginGoogle')">
+            <div class="btn-login-google" @click="loginApple">
                 Đăng nhập với Apple
             </div>
         </div>
@@ -47,34 +56,69 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { useCounterStore } from '@/stores/counter';
+import { computed, onMounted, ref } from 'vue';
 import router from '@/router/index';
 import service from '@/services/axios.service'
-const email = ref();
-const password = ref();
+import { useIsLoginStore } from '@/stores/login.js'
+const email = ref('');
+const password = ref('');
 const inValidateEmail = ref(false);
 const inValidatePassword = ref(false);
-const tagSearch = ref([]);;
+const remember = ref(false);
+const tagSearch = computed(() => {
+    let arr = [];
+    categorySearch.value.forEach(item => {
+        if (item.isSelected === true) {
+            arr = item.children;
+        }
+    });
+    return arr;
+})
+const searchHome = ref('');
+const categorySearch = ref([]);
+
+
+const loginGoogle = () => {
+    alert('comming soon');
+}
+const loginApple = () => {
+    alert('comming soon');
+}
+const searchClick = () => {
+    alert('comming soon');
+}
+const chooseTabCategory = (item) => {
+    categorySearch.value.forEach(item => {
+        item.isSelected = false;
+    });
+    item.isSelected = !item.isSelected;
+}
+const chooseTagSearch = (item) => {
+    alert('comming soon');
+}
 const loginClick = () => {
 
-    router?.replace({ name: 'home' });
-    return;
-    if (email.value === 'admin' && password.value === 'admin') {
-        // useCounterStore().setIsLogin(true);
+    inValidateEmail.value = inValidatePassword.value = false;
+
+    if (email.value.length > 0 && password.value.length > 0) {
+        useIsLoginStore().setIsLogin(true);
+        console.log(useIsLoginStore().getIsLogin);
         router?.replace({ name: 'home' });
     } else {
-        if (email.value !== 'admin') {
-            inValidateEmail.value = true;
-        }
-        if (password.value !== 'admin') {
-            inValidatePassword.value = true;
-        }
+        inValidateEmail.value = email?.value.length == 0;
+        inValidatePassword.value = password?.value.length == 0;
     }
 }
 const getData = async () => {
     let data = await service.get('/api/landing_page/get_web_footers_by_city_id?city_id=217');
-    tagSearch.value = data.data.reply.web_footer[3].children;
+    console.log(data);
+    categorySearch.value = data.data.reply.web_footer.filter(item => item.link !== 'https://shopeefood.vn');
+    //add property selected to categorySearch
+    categorySearch.value.forEach(item => {
+        item.isSelected = false;
+    });
+    categorySearch.value[0].isSelected = true;
+    console.log(categorySearch);
 }
 getData();
 </script>

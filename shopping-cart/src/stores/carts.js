@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-const initState = {};
+const initState = {
+    carts: []
+};
 
-export const useCounterStore = defineStore('carts', {
+export const useCartStore = defineStore('carts', {
     state: () => {
         return { ...initState }
     },
@@ -9,11 +11,15 @@ export const useCounterStore = defineStore('carts', {
         getCarts: (state) => state.carts
     },
     actions: {
-        increment() {
-            this.count++
+        setCarts(carts) {
+            this.carts = carts
         },
         updateQuantityCart(item) {
-            let existItem = this.carts.find((itemCart) => itemCart.id === item.id);
+            this.carts.forEach(cart => {
+                if (cart.id === item.id) {
+                    cart.quantity = item.quantity
+                }
+            })
         }
     }
 })
