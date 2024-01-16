@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 
 const initState = {
     isLogin: false,
-    isRemember: false
+    isRemember: false,
+    emailRegister: '',
 }
 
 export const useIsLoginStore = defineStore('isLogin', {
@@ -11,14 +12,12 @@ export const useIsLoginStore = defineStore('isLogin', {
     },
     getters: {
         getIsLogin: (state) => state.isLogin,
-        getIsRemember: (state) => state.isRemember
+        getIsRemember: (state) => state.isRemember,
+        getEmailRegister: (state) => state.emailRegister
     },
     actions: {
-        setIsRemember(status) {
-            this.isRemember = status
-        },
-        setIsLogin(status) {
-            this.isLogin = status
+        setEmailRegister(email) {
+            this.emailRegister = email
         }
     }
 })

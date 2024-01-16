@@ -29,10 +29,11 @@
         </div>
         <div class="f-login">
             <h1>Đăng nhập</h1>
-            <input class="i-email" v-model="email" placeholder="Tên đăng nhập*" />
-            <p class="error" :class="{ inValidateForm: inValidateEmail }">Tên đăng nhập không đúng</p>
-            <input class="i-email" type="password" v-model="password" placeholder="Mật khẩu*" />
-            <p class="error" :class="{ inValidateForm: inValidatePassword }">Mật khẩu không đúng</p>
+
+            <UiInputValidation :text="email" @update="updateEmail" :inValidate="inValidateEmail"
+                :messageValidate="messageValidateEmail" placeholder="Tên đăng nhập*" />
+            <UiInputValidation @update="updatePassword" type="password" :inValidate="inValidatePassword"
+                :messageValidate="messageValidatePassword" placeholder="Mật khẩu*" />
             <div class="c-function">
                 <div class="c-remember" @click="remember = !remember">
                     <input type="checkbox" id="remember" v-model="remember">
@@ -67,11 +68,14 @@ import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import router from '@/router/index';
 import service from '@/services/axios.service'
 import { useIsLoginStore } from '@/stores/login.js'
+import UiInputValidation from '@/components/baseForm/UiInputValidation.vue';
 const email = ref('');
 const password = ref('');
 const inValidateEmail = ref(false);
 const inValidatePassword = ref(false);
 const remember = ref(false);
+const messageValidatePassword = ref('Không được bỏ trống');
+const messageValidateEmail = ref('Không được bỏ trống');
 const tagSearch = computed(() => {
     let arr = [];
     categorySearch.value.forEach(item => {
@@ -81,6 +85,12 @@ const tagSearch = computed(() => {
     });
     return arr;
 })
+const updateEmail = (value) => {
+    email.value = value;
+}
+const updatePassword = (value) => {
+    password.value = value;
+}
 const searchHome = ref('');
 const categorySearch = ref([]);
 
@@ -109,7 +119,6 @@ const chooseTagSearch = (item) => {
     alert('comming soon');
 }
 const loginClick = () => {
-
     inValidateEmail.value = inValidatePassword.value = false;
 
     if (email.value.length > 0 && password.value.length > 0) {
@@ -117,8 +126,14 @@ const loginClick = () => {
             localStorage.setItem('isRememberLogin', JSON.stringify(true));
         routerToHome();
     } else {
-        inValidateEmail.value = email?.value.length == 0;
-        inValidatePassword.value = password?.value.length == 0;
+        if (email?.value?.length === 0) {
+            inValidateEmail.value = true;
+            messageValidateEmail.value = "Không được bỏ trống";
+        }
+        if (password?.value?.length === 0) {
+            inValidatePassword.value = true;
+            messageValidatePassword.value = "Không được bỏ trống";
+        }
     }
 }
 const getData = async () => {
@@ -132,9 +147,13 @@ const getData = async () => {
     categorySearch.value[0].isSelected = true;
     console.log(categorySearch);
 }
-
-onBeforeMount(() => {
+onMounted(() => {
     console.log('mounted login');
+    let emailRegis = useIsLoginStore()?.getEmailRegister;
+    console.log('get store pinia' + emailRegis);
+    if (emailRegis) {
+        email.value = emailRegis;
+    }
     getData();
     let isRememberLogin = JSON.parse(localStorage.getItem('isRememberLogin'));
     if (isRememberLogin) {
