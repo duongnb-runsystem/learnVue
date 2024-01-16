@@ -34,6 +34,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+
 const props = defineProps({
     show: Boolean,
     data: Object

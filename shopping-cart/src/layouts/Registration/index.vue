@@ -23,7 +23,8 @@
 import { ref } from 'vue';
 import router from '@/router/index';
 import UiInputValidation from '@/components/baseForm/UiInputValidation.vue';
-import { useIsLoginStore } from '@/stores/login.js'
+import { useAuthStore } from '@/stores/auth.js'
+const authStore = useAuthStore();
 const inValidateEmail = ref(false);
 const inValidatePassword = ref(false);
 const inValidateRePassword = ref(false);
@@ -45,14 +46,13 @@ const updateRePassword = (value) => {
     rePassword.value = value;
 }
 const registerClick = () => {
-    console.log("log value " + email.value.length, password.value, rePassword.value)
     inValidateEmail.value = false;
     inValidatePassword.value = false;
     inValidateRePassword.value = false;
 
     if (email?.value?.length > 0 && password?.value?.length > 0 && rePassword?.value?.length > 0) {
         if (password.value === rePassword.value) {
-            useIsLoginStore().setEmailRegister(email.value);
+            authStore.login();
             router.push('/');
         }
         else {

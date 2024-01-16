@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import checkAuth from './auth'
-
 const routes = [
   {
     path: '/',
@@ -10,7 +9,7 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/layouts/Registration/index.vue')
+    component: () => import('@/layouts/Registration/index.vue'),
   },
   {
     path: '/home',

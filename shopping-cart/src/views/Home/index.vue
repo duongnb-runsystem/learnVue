@@ -16,18 +16,12 @@ const listProduct = ref(null);
 const itemDetail = ref(null);
 const showOrderCart = ref(false);
 onMounted(() => {
-  console.log('mounted home');
   getData();
 });
-onBeforeMount(() => {
-  console.log('before mount home');
-});
+
 const getData = async () => {
-  console.log('get data store')
-  console.log(useCartStore().getCarts);
   const res = common.dataShop;
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
-  console.log(menu.value);
   // get data cart from local storage
   const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart'));
   if (cartFromLocalStorage) {
@@ -56,7 +50,6 @@ const showDetailClick = (item) => {
 const saveCartToLocalStorage = () => {
   localStorage.setItem('cart', JSON.stringify(cart.value));
   useCartStore().setCarts(cart.value);
-  console.log(useCartStore().getCarts);
 }
 const syncQuantityIntoMenu = (item) => {
   menu.value.forEach(itemMenu => {

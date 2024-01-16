@@ -67,8 +67,9 @@
 import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import router from '@/router/index';
 import service from '@/services/axios.service'
-import { useIsLoginStore } from '@/stores/login.js'
+import { useAuthStore } from '@/stores/auth.js'
 import UiInputValidation from '@/components/baseForm/UiInputValidation.vue';
+const authStore = useAuthStore();
 const email = ref('');
 const password = ref('');
 const inValidateEmail = ref(false);
@@ -138,22 +139,18 @@ const loginClick = () => {
 }
 const getData = async () => {
     let data = await service.get('/api/landing_page/get_web_footers_by_city_id?city_id=217');
-    console.log(data);
     categorySearch.value = data.data.reply.web_footer.filter(item => item.link !== 'https://shopeefood.vn');
     //add property selected to categorySearch
     categorySearch.value.forEach(item => {
         item.isSelected = false;
     });
     categorySearch.value[0].isSelected = true;
-    console.log(categorySearch);
 }
 onMounted(() => {
-    console.log('mounted login');
-    let emailRegis = useIsLoginStore()?.getEmailRegister;
-    console.log('get store pinia' + emailRegis);
-    if (emailRegis) {
-        email.value = emailRegis;
-    }
+    // let emailRegis = authStore()?.getEmailRegister;
+    // if (emailRegis) {
+    //     email.value = emailRegis;
+    // }
     getData();
     let isRememberLogin = JSON.parse(localStorage.getItem('isRememberLogin'));
     if (isRememberLogin) {
@@ -161,7 +158,7 @@ onMounted(() => {
     }
 });
 const routerToHome = () => {
-    useIsLoginStore().setIsLogin(true);
+    authStore.login();
     router?.push('/home');
 }
 getData();

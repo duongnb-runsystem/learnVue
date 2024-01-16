@@ -15,8 +15,9 @@ library.add(faEye, faEyeSlash, faRightToBracket, faMagnifyingGlass, faChevronUp,
 const app = createApp(App)
 
 app.component('font-awesome-icon', FontAwesomeIcon);
-app.use(createPinia())
+const pinia = createPinia();
 app.use(router)
+app.use(pinia)
 
 app.mount('#app')
 
