@@ -9,7 +9,7 @@ const instance = axios.create({
     'x-foody-client-version': '3.0.0',
     'x-foody-access-token': '',
     'x-foody-api-version': '1',
-    'x-foody-app-type': '1004'
+    'x-foody-app-type': '1004',
   }
 })
 

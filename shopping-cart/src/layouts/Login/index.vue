@@ -20,6 +20,9 @@
                     <span>{{ item.display_text }}</span>
                 </div>
             </div>
+            <div>
+
+            </div>
             <div class="c-footer-search">
                 Sử dụng App ShopeeFood để có nhiều giảm giá và trải nghiệm tốt hơn
             </div>
@@ -35,7 +38,7 @@
                     <input type="checkbox" id="remember" v-model="remember">
                     <span>Ghi nhớ đăng nhập</span>
                 </div>
-                <div class="c-forgot">
+                <div class="c-forgot" @click="forgotPassword">
                     <span>Quên mật khẩu</span>
                 </div>
             </div>
@@ -51,12 +54,16 @@
             <div class="btn-login-google" @click="loginApple">
                 Đăng nhập với Apple
             </div>
+            <div class="c-footer-login">
+                <span>Bạn chưa có tài khoản?</span>
+                <p @click="registerClick">Đăng ký</p>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import router from '@/router/index';
 import service from '@/services/axios.service'
 import { useIsLoginStore } from '@/stores/login.js'
@@ -77,7 +84,9 @@ const tagSearch = computed(() => {
 const searchHome = ref('');
 const categorySearch = ref([]);
 
-
+const forgotPassword = () => {
+    alert('comming soon');
+}
 const loginGoogle = () => {
     alert('comming soon');
 }
@@ -86,6 +95,9 @@ const loginApple = () => {
 }
 const searchClick = () => {
     alert('comming soon');
+}
+const registerClick = () => {
+    router?.push('/register');
 }
 const chooseTabCategory = (item) => {
     categorySearch.value.forEach(item => {
@@ -101,9 +113,9 @@ const loginClick = () => {
     inValidateEmail.value = inValidatePassword.value = false;
 
     if (email.value.length > 0 && password.value.length > 0) {
-        useIsLoginStore().setIsLogin(true);
-        console.log(useIsLoginStore().getIsLogin);
-        router?.replace({ name: 'home' });
+        if (remember.value)
+            localStorage.setItem('isRememberLogin', JSON.stringify(true));
+        routerToHome();
     } else {
         inValidateEmail.value = email?.value.length == 0;
         inValidatePassword.value = password?.value.length == 0;
@@ -120,7 +132,21 @@ const getData = async () => {
     categorySearch.value[0].isSelected = true;
     console.log(categorySearch);
 }
+
+onBeforeMount(() => {
+    console.log('mounted login');
+    getData();
+    let isRememberLogin = JSON.parse(localStorage.getItem('isRememberLogin'));
+    if (isRememberLogin) {
+        routerToHome();
+    }
+});
+const routerToHome = () => {
+    useIsLoginStore().setIsLogin(true);
+    router?.push('/home');
+}
 getData();
+
 </script>
 
 <style lang="scss">

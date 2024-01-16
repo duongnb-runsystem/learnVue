@@ -1,6 +1,6 @@
 <script setup>
 import common from '@/core/utils/common.js';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeMount } from 'vue';
 import DetailProduct from '@/components/product/DetailProduct.vue';
 import ListProduct from '@/components/product/ListProduct.vue';
 import ListCart from '@/components/product/ListCart.vue';
@@ -18,6 +18,9 @@ const showOrderCart = ref(false);
 onMounted(() => {
   console.log('mounted home');
   getData();
+});
+onBeforeMount(() => {
+  console.log('before mount home');
 });
 const getData = async () => {
   console.log('get data store')
