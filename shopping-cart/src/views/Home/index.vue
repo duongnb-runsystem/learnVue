@@ -1,5 +1,4 @@
 <script setup>
-import common from '@/core/utils/common.js';
 import { ref, computed, onMounted, onBeforeMount } from 'vue';
 import DetailProduct from '@/components/product/DetailProduct.vue';
 import ListProduct from '@/components/product/ListProduct.vue';
@@ -7,6 +6,10 @@ import ListCart from '@/components/product/ListCart.vue';
 import ListMenu from '@/components/product/ListMenu.vue';
 import OrderCart from '@/components/product/OrderCart.vue';
 import { useCartStore } from '@/stores/carts.js'
+import fireBaseApp from '@/firebase.js';
+import { getDatabase, ref as dbRef, set, onValue, get } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
+import { getDataShopCommon } from '@/core/utils/common';
 const menu = ref(null);
 const showDetail = ref(false);
 const searchTerm = ref('')
@@ -15,40 +18,62 @@ const dataCategory = ref([]);
 const listProduct = ref(null);
 const itemDetail = ref(null);
 const showOrderCart = ref(false);
+const db = getDatabase();
 onMounted(() => {
   getData();
+
 });
-const getData = async () => {
-  const res = common.dataShop;
-  menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
-  // get data cart from local storage
-  const cartFromLocalStorage = JSON.parse(localStorage.getItem('cart'));
-  if (cartFromLocalStorage) {
-    cart.value = cartFromLocalStorage;
-  }
-  // update data quantity from cart to menu
-  menu.value.forEach(itemMenu => {
-    itemMenu.dishes.forEach(itemDish => {
-      let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
-      if (existItem) {
-        itemDish.quantity = existItem.quantity;
-      }
+const syncCartWithFirebase = () => {
+  const userId = getIdAuth();
+  const dataRef = dbRef(db, userId);
+  onValue(dataRef, (snapshot) => {
+    cart.value = snapshot.val() === null ? [] : snapshot.val();
+    menu.value.forEach(itemMenu => {
+      itemMenu.dishes.forEach(itemDish => {
+        let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
+        if (existItem) {
+          itemDish.quantity = existItem.quantity;
+        }
+      });
     });
   });
+}
+const getIdAuth = () => {
+  const auth = getAuth(fireBaseApp);
+  console.log(auth.currentUser)
+  const user = auth.currentUser;
+  if (user) {
+    return user.uid;
+  } else {
+    return null
+  }
+}
+const getData = async () => {
+  const res = await getDataShopCommon();
+  menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
+  menu.value.forEach(itemMenu => {
+    itemMenu.dishes.forEach(itemDish => {
+      itemDish.quantity = 0;
+    });
+  })
+  //get data cart from firebase  
+  syncCartWithFirebase();
+
   menu.value.forEach(item => {
     dataCategory.value.push({ id: item.id, name: item.dish_type_name });
   });
 }
-// getData();
 
 const showDetailClick = (item) => {
   itemDetail.value = item;
   showDetail.value = true;
 }
-const saveCartToLocalStorage = () => {
-  localStorage.setItem('cart', JSON.stringify(cart.value));
-  useCartStore().setCarts(cart.value);
+const saveCartToFireBase = () => {
+  const userId = getIdAuth();
+  const dataRef = dbRef(db, userId);
+  set(dataRef, cart.value);
 }
+
 const syncQuantityIntoMenu = (item) => {
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
@@ -67,13 +92,13 @@ const addProduct = (item) => {
     existItem.quantity++;
     syncQuantityIntoMenu(existItem);
     // save cart to local storage
-    saveCartToLocalStorage();
+    saveCartToFireBase();
   } else {
     // If the item does not exist, set its quantity to 1 and add it to the cart
     item.quantity = 1;
     cart.value.push(item);
     // save cart to local storage
-    saveCartToLocalStorage();
+    saveCartToFireBase();
   }
 }
 
@@ -85,7 +110,7 @@ const subProduct = (item) => {
     if (existItem.quantity === 0) {
       cart.value = cart.value.filter((itemCart) => itemCart.id !== item.id);
     }
-    saveCartToLocalStorage();
+    saveCartToFireBase();
   }
 }
 
@@ -94,7 +119,7 @@ const removeCartClick = (item) => {
   syncQuantityIntoMenu(item);
   cart.value = cart.value.filter((itemCart) => itemCart.id !== item.id);
 
-  saveCartToLocalStorage();
+  saveCartToFireBase();
 }
 
 const scrollCategory = (item) => {
@@ -112,7 +137,7 @@ const orderCart = () => {
     });
   })
   cart.value = [];
-  saveCartToLocalStorage();
+  saveCartToFireBase();
   showOrderCart.value = false;
 }
 </script>

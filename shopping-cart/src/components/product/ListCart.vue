@@ -32,7 +32,7 @@ const changeSort = () => {
 }
 </script>
 <template>
-    <div class="c-content" v-if="data.length">
+    <div class="c-content" v-if="data?.length">
         <div class="c-header">
             <h1 @click="sortCart()">Giỏ hàng</h1>
             <p class="lb-cart" v-if="isCollaps">{{ sumCart }} </p>

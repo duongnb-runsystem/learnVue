@@ -144,6 +144,12 @@ nav a:first-of-type {
     align-items: center;
     gap: 10px;
 
+    img {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+    }
+
     .btn-logout {
       background-color: #ee4d2d;
       color: #fff;

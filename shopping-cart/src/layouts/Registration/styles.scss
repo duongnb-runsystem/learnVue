@@ -19,6 +19,47 @@
         border-radius: 5%;
         text-align: left;
 
+        input[type="file"] {
+            display: none;
+        }
+
+        .c-name-avatar {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100px;
+
+            .i-name {
+                width: 50%;
+            }
+
+            .c-avatar {
+                display: flex;
+                gap: 10px;
+                width: 50%;
+            }
+
+            .i-avatar {
+                height: 100px;
+                width: 100px;
+                border-radius: 50%;
+            }
+
+            .custom-file-upload {
+                padding: 10px;
+                margin: auto;
+                background-color: #4CAF50;
+                color: white;
+                cursor: pointer;
+                height: 45px;
+                border-radius: 5px;
+            }
+        }
+
+
+
+
+
         .btn-regis {
             width: 70%;
             height: 50px;
@@ -39,7 +80,7 @@
         }
 
         .c-footer-regis {
-            margin-top: 100px;
+            margin-top: 50px;
             text-align: center;
 
             span {

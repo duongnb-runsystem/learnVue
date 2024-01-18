@@ -111,7 +111,8 @@ const forgotPassword = () => {
 const loginGoogle = () => {
 
     const ggProvider = new GoogleAuthProvider();
-    const auth = getAuth(fireBaseApp);
+    const auth = getAuth();
+    const user = auth.currentUser;
     signInWithPopup(auth, ggProvider).then((result) => {
 
         routerToHome();

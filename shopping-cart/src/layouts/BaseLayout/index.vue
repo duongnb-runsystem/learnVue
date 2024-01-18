@@ -1,5 +1,5 @@
 <script setup>
-import common from '@/core/utils/common.js';
+import { dataDetailShop } from '@/core/utils/common.js';
 
 import { ref, onMounted } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
@@ -20,12 +20,13 @@ const urlImgThumb = ref(null);
 const isCallApi = ref(false);
 const phone = ref(null);
 const nameUser = ref(null);
+const avatarUser = ref(null);
 onMounted(() => {
   getData();
 });
 
 const getData = async () => {
-  let data = common.dataDetailShop;
+  const data = await dataDetailShop();
   //get detail shop for header
 
   address.value = data.address;
@@ -43,6 +44,7 @@ const getData = async () => {
   const user = auth.currentUser;
   if (user) {
     nameUser.value = user.email;
+    avatarUser.value = user.photoURL;
   } else {
     // No user is signed in.
   }
@@ -66,6 +68,7 @@ const logout = async () => {
         <img class="i-shopee"
           src="https://shopeefood.vn/app/assets/img/shopeefoodvn.png?4aa1a38e8da801f4029b80734905f3f7" />
         <div class="c-user">
+          <img :src="avatarUser" v-if="avatarUser" />
           <span class="lb-name">{{ nameUser }}</span>
           <span class="btn-logout" @click="logout">Đăng xuất</span>
         </div>

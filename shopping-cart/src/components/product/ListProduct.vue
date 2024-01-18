@@ -17,9 +17,6 @@ const fillterData = computed(() => {
                 data.push({ idItem: item.dish_type_id, itemFillter: i });
             }
         });
-
-        console.log(data)
-
         return data;
     }
 })
@@ -44,9 +41,7 @@ defineExpose({
     scrollToItem,
 })
 const showDetailItemEmit = (item) => {
-    console.log(fillterData)
     emit('showDetailEmit', item);
-
 }
 const addCartItem = (item) => {
     emit('addCart', item);
@@ -67,7 +62,7 @@ const subCartItem = (item) => {
         </div>
     </div>
 
-    <div v-else v-for="(category) in menu" :id="category.id">
+    <div v-else v-for="(category) in menu" :id="category.dish_type_name">
         <h1>{{ category.dish_type_name }}</h1>
         <div v-for="item in category.dishes" :id="item.id">
             <ItemProduct @showDetailItem="showDetailItemEmit" :item="item" @subCart="subCartItem" @addCart="addCartItem">

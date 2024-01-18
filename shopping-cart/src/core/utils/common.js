@@ -153,31 +153,21 @@ export const calculateTotal = (data, includeAdditionalFee) => {
   }
   return formatVND(sum);
 };
-const getIdShopCommon = async () => {
+export const getIdShopCommon = async () => {
   let url = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
   let deliveryUrl = url.replace("https://shopeefood.vn/", "");
   let rsIdShop = await service.get(`api/delivery/get_from_url?url=${deliveryUrl}`);
   return rsIdShop.data.reply.delivery_id;
 }
-const getDataDetailShopCommon = async () => {
+export const dataDetailShop = async () => {
   var id = await getIdShopCommon();
   const result = await service.get(`api/delivery/get_detail?id_type=2&request_id=${id}`);
   return result.data.reply.delivery_detail;
 }
-const getDataShopCommon = async () => {
+
+export const getDataShopCommon = async () => {
   var id = await getIdShopCommon();
   //get menu
   const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${id}`);
   return res;
 }
-
-
-
-
-
-const common = {
-  dataDetailShop: await getDataDetailShopCommon(),
-  dataShop: await getDataShopCommon(),
-
-}
-export default common;
