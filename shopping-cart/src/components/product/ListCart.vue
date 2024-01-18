@@ -1,9 +1,11 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
+import { formatVND, calculateTotal } from '@/core/utils/common';
 const isCollaps = ref(false);
 const props = defineProps({
     data: Object,
 })
+
 const sumCart = computed(() => {
     let sum = 0;
     props.data.forEach(item => {
@@ -12,23 +14,12 @@ const sumCart = computed(() => {
     return sum;
 })
 const sumPrice = computed(() => {
-    let sum = 0;
-    props.data.forEach(item => {
-        sum += item.price.value * item.quantity;
-    });
-    return formatVND(sum);
+    return calculateTotal(props.data, false);
 })
-const formatVND = (value) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-};
+
 const emit = defineEmits(['removeCart', 'orderCart']);
 const totalPrice = computed(() => {
-    let sum = 0;
-    props.data.forEach(item => {
-        sum += item.price.value * item.quantity;
-    });
-    sum += 15000;
-    return formatVND(sum);
+    return calculateTotal(props.data, true);
 })
 
 const isSortAtoZ = ref(true);
@@ -36,12 +27,8 @@ const scrSort = ref();
 const changeSort = () => {
     isSortAtoZ.value = !isSortAtoZ.value;
     scrSort.value = isSortAtoZ ? "arrow-down-a-z" : "arrow-down-z-a"
-    props.data.value = props.data.sort((a, b) => {
-        if (isSortAtoZ.value)
-            return a.quantity - b.quantity;
-        else
-            return b.quantity - a.quantity;
-    });
+    const sortOrder = isSortAtoZ.value ? 1 : -1;
+    props.data.value = props.data.sort((a, b) => sortOrder * (a.quantity - b.quantity));
 }
 </script>
 <template>
@@ -54,11 +41,13 @@ const changeSort = () => {
                 @click="isCollaps = !isCollaps" />
         </div>
         <div class="collapsible" :class="{ collapCart: !isCollaps }">
-            <div class="c-cart" v-for="  item   in    data   ">
-                <img class="i-thumb" :src="item.photos[1].value" />
-                <p class="name">{{ item.name }}</p>
-                <p class="quantity">{{ item.quantity }}</p>
-                <div class="btn-quatity remove" @click="emit('removeCart', item)">x</div>
+            <div class="c-list-cart">
+                <div class="c-cart" :id="item.id" v-for="item in data">
+                    <img class="i-thumb" :src="item.photos[1].value" />
+                    <p class="name">{{ item.name }}</p>
+                    <p class="quantity">{{ item.quantity }}</p>
+                    <div class="btn-quatity remove" @click="emit('removeCart', item)">x</div>
+                </div>
             </div>
             <div class="c-priceShip">
                 <p class="lb-titlePrice"> Tổng cộng ({{ sumCart }} món)</p>
@@ -80,6 +69,11 @@ const changeSort = () => {
     </div>
 </template>
 <style scoped lang="scss">
+.c-list-cart {
+    overflow-y: auto;
+    max-height: 300px;
+}
+
 .fa-sort {
     width: 20px;
     height: 20px;
@@ -119,6 +113,7 @@ const changeSort = () => {
     height: 20px;
     margin-left: auto;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .rotated {

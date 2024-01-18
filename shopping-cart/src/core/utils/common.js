@@ -123,6 +123,36 @@ export const scrollToTop = () => {
 
 }
 
+export const processErrorFirebase = (errorCode) => {
+  switch (errorCode) {
+    case 'auth/invalid-email':
+      return 'Email không hợp lệ';
+    case 'auth/user-disabled':
+      return 'Tài khoản đã bị vô hiệu hóa';
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Sai thông tin đăng nhập';
+    case 'auth/email-already-in-use':
+      return 'Email đã được sử dụng';
+    default:
+      return 'Đã có lỗi xảy ra';
+  }
+}
+
+export const formatVND = (value) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+};
+export const calculateTotal = (data, includeAdditionalFee) => {
+  let sum = 0;
+  data.forEach(item => {
+    sum += item.price.value * item.quantity;
+  });
+
+  if (includeAdditionalFee) {
+    sum += 15000;
+  }
+  return formatVND(sum);
+};
 const getIdShopCommon = async () => {
   let url = "https://shopeefood.vn/ho-chi-minh/highlands-coffee-bach-dang";
   let deliveryUrl = url.replace("https://shopeefood.vn/", "");
@@ -148,5 +178,6 @@ const getDataShopCommon = async () => {
 const common = {
   dataDetailShop: await getDataDetailShopCommon(),
   dataShop: await getDataShopCommon(),
+
 }
 export default common;

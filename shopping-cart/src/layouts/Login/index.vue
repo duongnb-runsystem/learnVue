@@ -10,19 +10,17 @@
                 </div>
             </div>
             <div class="c-tab-category">
-                <div class="tab-category" v-for="item in categorySearch" @click="chooseTabCategory(item)">
+                <div class="tab-category" v-for="item in categorySearch" :id="item.id" @click="chooseTabCategory(item)">
                     <span>{{ item.display_text }}</span>
                     <div :class="{ isSelected: item.isSelected }"> </div>
                 </div>
             </div>
             <div class="c-tag-search">
-                <div class="tag-search" v-for="item in tagSearch" @click="chooseTagSearch(item)">
+                <div class="tag-search" v-for="item in tagSearch" :id="item.id" @click="chooseTagSearch(item)">
                     <span>{{ item.display_text }}</span>
                 </div>
             </div>
-            <div>
 
-            </div>
             <div class="c-footer-search">
                 Sử dụng App ShopeeFood để có nhiều giảm giá và trải nghiệm tốt hơn
             </div>
@@ -52,8 +50,9 @@
                 <img src="@/assets/images/icon-google.svg" />
                 Đăng nhập với Google
             </div>
-            <div class="btn-login-google" @click="loginApple">
-                Đăng nhập với Apple
+            <div class="btn-login-google" @click="loginFacebook">
+                <img src="@/assets/images/icon-facebook.svg" />
+                Đăng nhập với Facebook
             </div>
             <div class="c-footer-login">
                 <span>Bạn chưa có tài khoản?</span>
@@ -61,14 +60,25 @@
             </div>
         </div>
     </div>
+    <Teleport to="body">
+        <ModalError :show="showErorr" :data="msgError" @close="showErorr = false"></ModalError>
+    </Teleport>
 </template>
 
 <script setup>
+import ModalError from '@/components/baseForm/ModalError.vue';
 import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import router from '@/router/index';
 import service from '@/services/axios.service'
 import { useAuthStore } from '@/stores/auth.js'
 import UiInputValidation from '@/components/baseForm/UiInputValidation.vue';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import fireBaseApp from '@/firebase.js';
+import { isValidEmail } from '@/core/utils/regexValidate.js'
+import { processErrorFirebase } from '@/core/utils/common.js'
+
+const msgError = ref('');
+const showErorr = ref(false);
 const authStore = useAuthStore();
 const email = ref('');
 const password = ref('');
@@ -99,9 +109,18 @@ const forgotPassword = () => {
     alert('comming soon');
 }
 const loginGoogle = () => {
-    alert('comming soon');
+
+    const ggProvider = new GoogleAuthProvider();
+    const auth = getAuth(fireBaseApp);
+    signInWithPopup(auth, ggProvider).then((result) => {
+
+        routerToHome();
+
+    }).catch((error) => {
+        // Handle Errors here.
+    })
 }
-const loginApple = () => {
+const loginFacebook = () => {
     alert('comming soon');
 }
 const searchClick = () => {
@@ -119,24 +138,40 @@ const chooseTabCategory = (item) => {
 const chooseTagSearch = (item) => {
     alert('comming soon');
 }
-const loginClick = () => {
+const loginClick = async () => {
     inValidateEmail.value = inValidatePassword.value = false;
+    if (email?.value?.length === 0) {
+        inValidateEmail.value = true;
+        messageValidateEmail.value = "Không được bỏ trống";
+        return;
+    }
+    if (!isValidEmail(email.value)) {
+        inValidateEmail.value = true;
+        messageValidateEmail.value = "Email không hợp lệ";
+        return;
+    }
+    if (password?.value?.length === 0) {
+        inValidatePassword.value = true;
+        messageValidatePassword.value = "Không được bỏ trống";
+        return;
+    }
 
     if (email.value.length > 0 && password.value.length > 0) {
         if (remember.value)
             localStorage.setItem('isRememberLogin', JSON.stringify(true));
-        routerToHome();
-    } else {
-        if (email?.value?.length === 0) {
-            inValidateEmail.value = true;
-            messageValidateEmail.value = "Không được bỏ trống";
-        }
-        if (password?.value?.length === 0) {
-            inValidatePassword.value = true;
-            messageValidatePassword.value = "Không được bỏ trống";
-        }
+        // routerToHome();
+        const auth = getAuth(fireBaseApp);
+        await signInWithEmailAndPassword(auth, email.value, password.value).then((userCredential) => {
+            const user = userCredential.user;
+            routerToHome();
+        })
+            .catch((error) => {
+                msgError.value = processErrorFirebase(error.code);
+                showErorr.value = true;
+            })
     }
 }
+
 const getData = async () => {
     let data = await service.get('/api/landing_page/get_web_footers_by_city_id?city_id=217');
     categorySearch.value = data.data.reply.web_footer.filter(item => item.link !== 'https://shopeefood.vn');
@@ -147,18 +182,29 @@ const getData = async () => {
     categorySearch.value[0].isSelected = true;
 }
 onMounted(() => {
-    // let emailRegis = authStore()?.getEmailRegister;
-    // if (emailRegis) {
-    //     email.value = emailRegis;
-    // }
+    let emailRegister = authStore.getEmailRegister;
+    if (emailRegister) {
+        email.value = emailRegister;
+    }
     getData();
     let isRememberLogin = JSON.parse(localStorage.getItem('isRememberLogin'));
     if (isRememberLogin) {
-        routerToHome();
+        const auth = getAuth(fireBaseApp);
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const uid = user.uid;
+                if (uid !== null) {
+                    routerToHome();
+                }
+            }
+            else {
+                localStorage.setItem('isRememberLogin', JSON.stringify(false));
+            }
+        });
+
     }
 });
 const routerToHome = () => {
-    authStore.login();
     router?.push('/home');
 }
 getData();

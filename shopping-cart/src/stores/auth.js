@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 const initState = {
-    isAuthenticated: false,
+    emailRegister: '',
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -9,20 +9,11 @@ export const useAuthStore = defineStore('auth', {
         return { ...initState }
     },
     getters: {
-        // getIsLogin: (state) => state.isLogin,
-        // getIsRemember: (state) => state.isRemember,
-        // getEmailRegister: (state) => state.emailRegister
+        getEmailRegister: (state) => state.emailRegister
     },
     actions: {
         setEmailRegister(email) {
             this.emailRegister = email
         },
-        login() {
-            this.isAuthenticated = true
-        },
-        logout() {
-            this.isAuthenticated = false
-        },
-
     }
 })

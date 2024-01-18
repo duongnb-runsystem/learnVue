@@ -3,16 +3,18 @@
         <div v-if="show" class="modal-mask">
             <div class="modal-container">
                 <h1>Xác nhận đơn hàng</h1>
-                <div class="c-cart" v-for="item in data">
-                    <img class="i-thumb" :src="item.photos[1].value" />
-                    <p class="name">{{ item.name }}</p>
-                    <div class="c-quantity">
-                        <p class="lb-titlePrice">Số lượng </p>
-                        <p class="lb-price">{{ item.quantity }}</p>
+                <div class="c-list-cart">
+                    <div class="c-cart" v-for="item in data" :id="item.id">
+                        <img class="i-thumb" :src="item.photos[1].value" />
+                        <p class="name">{{ item.name }}</p>
+                        <div class="c-quantity">
+                            <p class="lb-titlePrice">Số lượng </p>
+                            <p class="lb-price">{{ item.quantity }}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="c-priceShip">
-                    <p class="lb-titlePrice"> Tổng cộng ({{ sumCart }} món)</p>
+                    <p class="lb-titlePrice"> Tổng cộng ({{ sumQuantity }} món)</p>
                     <p class="lb-price">{{ sumPrice }}</p>
                 </div>
                 <div class="c-priceShip">
@@ -34,40 +36,33 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-
+import { formatVND, calculateTotal } from '@/core/utils/common';
 const props = defineProps({
     show: Boolean,
     data: Object
 })
-const totalPrice = computed(() => {
-    let sum = 0;
-    props.data.forEach(item => {
-        sum += item.price.value * item.quantity;
-    });
-    sum += 15000;
-    return formatVND(sum);
-})
 const emit = defineEmits(['confirm', 'close']);
-const sumCart = computed(() => {
+const totalPrice = computed(() => {
+    return calculateTotal(props.data, true);
+})
+const sumPrice = computed(() => {
+    return calculateTotal(props.data, false);
+})
+const sumQuantity = computed(() => {
     let sum = 0;
     props.data.forEach(item => {
         sum += item.quantity;
     });
     return sum;
 })
-const sumPrice = computed(() => {
-    let sum = 0;
-    props.data.forEach(item => {
-        sum += item.price.value * item.quantity;
-    });
-    return formatVND(sum);
-})
-const formatVND = (value) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-};
 </script>
 
 <style lang="scss" scoped>
+.c-list-cart {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 .col-btn {
     display: flex;
     justify-content: center;

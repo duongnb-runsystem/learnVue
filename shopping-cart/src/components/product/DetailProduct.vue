@@ -29,7 +29,7 @@ const prop = defineProps({
         </div>
     </Transition>
 </template>
-<style scoped>
+<style scoped lang="scss">
 /* */
 .modal-mask {
     position: fixed;

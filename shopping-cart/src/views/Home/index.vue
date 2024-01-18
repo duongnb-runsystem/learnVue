@@ -18,7 +18,6 @@ const showOrderCart = ref(false);
 onMounted(() => {
   getData();
 });
-
 const getData = async () => {
   const res = common.dataShop;
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
@@ -37,9 +36,8 @@ const getData = async () => {
     });
   });
   menu.value.forEach(item => {
-    dataCategory.value.push(item.dish_type_name);
+    dataCategory.value.push({ id: item.id, name: item.dish_type_name });
   });
-
 }
 // getData();
 
@@ -100,7 +98,7 @@ const removeCartClick = (item) => {
 }
 
 const scrollCategory = (item) => {
-  listProduct.value.scrollToItem(item);
+  listProduct.value.scrollToItem(item.name);
 }
 
 const orderCart = () => {

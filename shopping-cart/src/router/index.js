@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
 import checkAuth from './auth'
 const routes = [
   {
     path: '/',
     name: 'login',
-    component: () => import('@/layouts/Login/index.vue')
+    component: () => import('@/layouts/Login/index.vue'),
   },
   {
     path: '/register',

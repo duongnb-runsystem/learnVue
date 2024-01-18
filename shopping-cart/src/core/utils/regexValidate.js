@@ -3,7 +3,7 @@ import { DEFAULT_EMPTY } from '@/core/constants/app'
 /**
  * Common regex
  */
-export const REG_EMAIL_FORMAT = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+export const REG_EMAIL_FORMAT = new RegExp(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/)
 export const REG_NUMBER_ONLY = new RegExp(/^\d+$/)
 export const REG_HALF_WIDTH_ALPNUMBERIC = new RegExp(/^[a-zA-Z0-9]+$/)
 export const REG_URL_FORMAT = new RegExp(
@@ -21,7 +21,7 @@ export const stringFormat = (str, ...args) =>
 export const isValidEmail = (mail) => {
   // Check Email format
   if (!mail) return true
-  return REG_URL_FORMAT.test(mail)
+  return REG_EMAIL_FORMAT.test(mail)
 }
 
 // Regex check phone number. 0XXXXXXXXX | 0XXXXXXXXXX

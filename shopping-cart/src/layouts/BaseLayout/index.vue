@@ -2,6 +2,10 @@
 import common from '@/core/utils/common.js';
 
 import { ref, onMounted } from 'vue';
+import { getAuth, signOut } from 'firebase/auth';
+import fireBaseApp from '@/firebase.js';
+import router from '../../router';
+import { formatVND } from '@/core/utils/common';
 /**
  * Layout: use for pages're logged
  */
@@ -15,12 +19,11 @@ const maxOrder = ref(null);
 const urlImgThumb = ref(null);
 const isCallApi = ref(false);
 const phone = ref(null);
+const nameUser = ref(null);
 onMounted(() => {
   getData();
 });
-const formatVND = (value) => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-};
+
 const getData = async () => {
   let data = common.dataDetailShop;
   //get detail shop for header
@@ -35,12 +38,39 @@ const getData = async () => {
   urlImgThumb.value = data.photos[9].value;
   phone.value = data.phones[0];
   isCallApi.value = true;
+  //get data user
+  const auth = getAuth(fireBaseApp);
+  const user = auth.currentUser;
+  if (user) {
+    nameUser.value = user.email;
+  } else {
+    // No user is signed in.
+  }
+}
+const logout = async () => {
+  localStorage.setItem('isRememberLogin', JSON.stringify(false));
+  const auth = getAuth(fireBaseApp);
+  await signOut(auth).then(() => {
+    // Sign-out successful.
+    router.push('/');
+  }).catch((error) => {
+    // An error happened.
+  });
 }
 </script>
 
 <template>
   <div class="base-layout">
     <header>
+      <div class="c-header-nav">
+        <img class="i-shopee"
+          src="https://shopeefood.vn/app/assets/img/shopeefoodvn.png?4aa1a38e8da801f4029b80734905f3f7" />
+        <div class="c-user">
+          <span class="lb-name">{{ nameUser }}</span>
+          <span class="btn-logout" @click="logout">Đăng xuất</span>
+        </div>
+
+      </div>
       <div class="c-hearder-banner" v-if="isCallApi">
         <img class="img-banner" :src="urlImgThumb" />
         <div class="c-hearder-infor">
@@ -49,7 +79,7 @@ const getData = async () => {
           <p class="add-restautant">{{ address }}</p>
           <p class="add-restautant">SĐT: {{ phone }}</p>
           <div class="rating">
-            <font-awesome-icon v-for="item in rattingStart" class="start" :icon="['fas', 'star']" />
+            <font-awesome-icon v-for="item in rattingStart" :id="item" class="start" :icon="['fas', 'star']" />
             <span class="countRate"> {{ rattingCount }}</span>
             đánh giá trên ShopeeFood
           </div>

@@ -7,8 +7,8 @@ const emit = defineEmits(['scrollCategory']);
 <template>
     <div class="left-content">
         <h1>Thực đơn</h1>
-        <div class="c-category" v-for="item in data" @click="emit('scrollCategory', item)">
-            <h3>{{ item }}</h3>
+        <div class="c-category" :id="item.id" v-for="item in data" @click="emit('scrollCategory', item)">
+            <h3>{{ item.name }}</h3>
         </div>
     </div>
 </template>
