@@ -10,6 +10,10 @@ import fireBaseApp from '@/firebase.js';
 import { getDatabase, ref as dbRef, set, onValue, get } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 import { getDataShopCommon } from '@/core/utils/common';
+import { useRouter } from 'vue-router';
+import { useRestaurantStore } from '@/stores/restaurant.js';
+
+const router = useRouter();
 const menu = ref(null);
 const showDetail = ref(false);
 const searchTerm = ref('')
@@ -19,10 +23,7 @@ const listProduct = ref(null);
 const itemDetail = ref(null);
 const showOrderCart = ref(false);
 const db = getDatabase();
-onMounted(() => {
-  getData();
 
-});
 const syncCartWithFirebase = () => {
   const userId = getIdAuth();
   const dataRef = dbRef(db, userId);
@@ -40,7 +41,6 @@ const syncCartWithFirebase = () => {
 }
 const getIdAuth = () => {
   const auth = getAuth(fireBaseApp);
-  console.log(auth.currentUser)
   const user = auth.currentUser;
   if (user) {
     return user.uid;
@@ -48,8 +48,15 @@ const getIdAuth = () => {
     return null
   }
 }
-const getData = async () => {
-  const res = await getDataShopCommon();
+onMounted(() => {
+  const data = useRestaurantStore().getRestaurant;
+  if (data) {
+    const url = data.restaurant_url;
+    getData(url)
+  }
+})
+const getData = async (url) => {
+  const res = await getDataShopCommon(url);
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {

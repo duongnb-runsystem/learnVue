@@ -33,12 +33,16 @@ const emit = defineEmits(['scrollCategory']);
 
     h3 {
         height: 100%;
+        font-size: 15px;
         margin-top: auto;
         margin-bottom: auto;
         display: flex;
-        justify-content: center;
-        text-align: center;
+        justify-content: left;
+        text-align: left;
         align-items: center;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 }
 

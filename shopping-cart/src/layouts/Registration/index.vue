@@ -11,7 +11,7 @@
                     <label for="i-avatar-input" class="custom-file-upload">
                         Choose File
                     </label>
-                    <input id="i-avatar-input" type="file" @change="onFileChange">
+                    <input id="i-avatar-input" type="file" @change="onFileChange" accept="image/*">
                     <img class="i-avatar" :src="imageUrl" v-if="imageUrl">
                 </div>
             </div>
@@ -48,6 +48,7 @@ import { isValidEmail } from '@/core/utils/regexValidate.js';
 import { processErrorFirebase } from '@/core/utils/common.js';
 import ModalError from '@/components/baseForm/ModalError.vue';
 import { update } from 'firebase/database';
+import { useCommonStore } from '@/stores/_common.js';
 
 const authStore = useAuthStore();
 const inValidateEmail = ref(false);
@@ -91,6 +92,7 @@ const updateRePassword = (value) => {
     rePassword.value = value;
 }
 const registerClick = async () => {
+
     inValidateEmail.value = false;
     inValidatePassword.value = false;
     inValidateRePassword.value = false;
@@ -113,8 +115,8 @@ const registerClick = async () => {
         }
         const auth = getAuth(fireBaseApp);
         await createUserWithEmailAndPassword(auth, email.value, password.value).then(async (userCredential) => {
+            useCommonStore().setLoading(true);
             const user = userCredential.user;
-
 
             // Create a storage reference
             const storage = getStorage();
@@ -129,11 +131,12 @@ const registerClick = async () => {
 
             authStore.setEmailRegister(email.value);
             signOut(auth);
-            router.push('/');
+            useCommonStore().setLoading(false);
         })
             .catch((error) => {
                 msgError.value = processErrorFirebase(error.code);
                 showErorr.value = true;
+                useCommonStore().setLoading(false);
             })
     }
     else {

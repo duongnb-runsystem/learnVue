@@ -76,7 +76,6 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopu
 import fireBaseApp from '@/firebase.js';
 import { isValidEmail } from '@/core/utils/regexValidate.js'
 import { processErrorFirebase } from '@/core/utils/common.js'
-
 const msgError = ref('');
 const showErorr = ref(false);
 const authStore = useAuthStore();
@@ -111,8 +110,7 @@ const forgotPassword = () => {
 const loginGoogle = () => {
 
     const ggProvider = new GoogleAuthProvider();
-    const auth = getAuth();
-    const user = auth.currentUser;
+    const auth = getAuth(fireBaseApp);
     signInWithPopup(auth, ggProvider).then((result) => {
 
         routerToHome();
@@ -181,6 +179,8 @@ const getData = async () => {
         item.isSelected = false;
     });
     categorySearch.value[0].isSelected = true;
+
+
 }
 onMounted(() => {
     let emailRegister = authStore.getEmailRegister;

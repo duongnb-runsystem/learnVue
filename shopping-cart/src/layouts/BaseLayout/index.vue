@@ -1,11 +1,14 @@
 <script setup>
 import { dataDetailShop } from '@/core/utils/common.js';
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import fireBaseApp from '@/firebase.js';
-import router from '../../router';
+import router from '@/router/index';
 import { formatVND } from '@/core/utils/common';
+import service from '@/services/axios.service';
+import { useRestaurantStore } from '@/stores/restaurant.js';
+
 /**
  * Layout: use for pages're logged
  */
@@ -21,12 +24,23 @@ const isCallApi = ref(false);
 const phone = ref(null);
 const nameUser = ref(null);
 const avatarUser = ref(null);
-onMounted(() => {
-  getData();
-});
+const categorySearch = ref([]);
 
-const getData = async () => {
-  const data = await dataDetailShop();
+
+onMounted(() => {
+  getCategoryShop();
+});
+const res = computed(() => {
+  const data = useRestaurantStore().getRestaurant;
+  console.log('base', data)
+  if (data) {
+    const url = data.restaurant_url;
+    getData(url)
+  }
+  return data
+})
+const getData = async (url) => {
+  const data = await dataDetailShop(url);
   //get detail shop for header
 
   address.value = data.address;
@@ -43,11 +57,27 @@ const getData = async () => {
   const auth = getAuth(fireBaseApp);
   const user = auth.currentUser;
   if (user) {
-    nameUser.value = user.email;
+    nameUser.value = user.displayName;
     avatarUser.value = user.photoURL;
   } else {
     // No user is signed in.
   }
+}
+
+const getCategoryShop = async () => {
+  let data = await service.get('/api/landing_page/get_web_footers_by_city_id?city_id=217');
+  categorySearch.value = data.data.reply.web_footer.filter(item => item.link !== 'https://shopeefood.vn');
+  //add property selected to categorySearch
+  categorySearch.value.forEach(item => {
+    item.isSelected = false;
+  });
+  categorySearch.value[0].isSelected = true;
+}
+const chooseTabCategory = (item) => {
+  categorySearch.value.forEach(item => {
+    item.isSelected = false;
+  });
+  item.isSelected = !item.isSelected;
 }
 const logout = async () => {
   localStorage.setItem('isRememberLogin', JSON.stringify(false));
@@ -67,6 +97,12 @@ const logout = async () => {
       <div class="c-header-nav">
         <img class="i-shopee"
           src="https://shopeefood.vn/app/assets/img/shopeefoodvn.png?4aa1a38e8da801f4029b80734905f3f7" />
+        <div class="c-tab-category">
+          <div class="tab-category" v-for="item in categorySearch" :id="item.id" @click="chooseTabCategory(item)">
+            <span :class="{ isSelectedlb: item.isSelected }">{{ item.display_text }}</span>
+            <div :class="{ isSelected: item.isSelected }"> </div>
+          </div>
+        </div>
         <div class="c-user">
           <img :src="avatarUser" v-if="avatarUser" />
           <span class="lb-name">{{ nameUser }}</span>
@@ -74,7 +110,7 @@ const logout = async () => {
         </div>
 
       </div>
-      <div class="c-hearder-banner" v-if="isCallApi">
+      <div class="c-hearder-banner" v-if="res">
         <img class="img-banner" :src="urlImgThumb" />
         <div class="c-hearder-infor">
           <p class="kind-restaurant">{{ kind }}</p>

@@ -1,0 +1,74 @@
+.c-content-restaurent {
+    background-color: rgb(242, 242, 242);
+
+    .c-all-restaurent {
+        display: grid;
+        height: 1700px;
+        width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+        column-gap: 10px;
+        row-gap: 10px;
+        padding-top: 20px;
+        grid-template-columns: repeat(5, 1fr);
+
+
+        .item-restaurent {
+            cursor: pointer;
+            border-radius: 10px;
+            width: fill-available;
+            background-color: #fff;
+            padding: 10px;
+            width: 250px;
+
+            .img-restaurent {
+                width: 100%;
+                height: 200px;
+                border-radius: 10px;
+            }
+
+            .name-restaurent {
+                font-weight: 700;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                padding: 0px;
+                margin: 0px;
+            }
+
+            .address-restaurent {
+                padding: 0px;
+                font-size: 14px;
+                margin: 0px;
+            }
+
+            .c-voucher {
+                gap: 10px;
+                text-align: left;
+                justify-content: left;
+                display: flex;
+
+                .img-voucher {
+                    height: 20px;
+                    width: 20px;
+                    border-radius: 20%;
+                }
+
+                .promotion-restaurent {
+                    margin: 0;
+                    padding: 0px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #03a3bc;
+                }
+            }
+
+
+            // .rating-restaurent {
+            //     margin-top: 10px;
+            //     font-size: 14px;
+            //     color: #ccc;
+            // }
+        }
+    }
+}

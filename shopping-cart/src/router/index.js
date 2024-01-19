@@ -19,7 +19,12 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'home',
+        name: 'restaurant',
+        component: () => import('@/views/Restaurant/index.vue')
+      },
+      {
+        path: '/shop',
+        name: 'shop',
         component: () => import('@/views/Home/index.vue')
       },
       {
