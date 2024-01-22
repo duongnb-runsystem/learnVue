@@ -30,9 +30,26 @@ const emit = defineEmits(['scrollCategory']);
 }
 
 .c-category {
-    height: 500px;
+    max-height: 500px;
     width: 100%;
     overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #fff;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 }
 
 .i-category {
@@ -41,17 +58,12 @@ const emit = defineEmits(['scrollCategory']);
     margin-top: 10px;
 
     h3 {
-        height: 100%;
-        font-size: 15px;
-        margin-top: auto;
-        margin-bottom: auto;
-        display: flex;
-        justify-content: left;
-        text-align: left;
-        align-items: center;
         overflow: hidden;
-        white-space: wrap;
+        white-space: nowrap;
         text-overflow: ellipsis;
+        padding: 0px;
+        margin: 0px;
+        font-size: 15px;
     }
 }
 

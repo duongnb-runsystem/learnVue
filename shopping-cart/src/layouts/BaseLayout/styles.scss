@@ -1,89 +1,8 @@
 .base-layout {
   display: flex;
   flex-direction: column;
-
 }
 
-.img-banner {
-  height: 300px;
-  width: 480px;
-}
-
-
-
-.c-hearder-banner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 400px;
-
-
-}
-
-.c-hearder-infor {
-  flex-direction: column;
-  display: flex;
-  margin-left: 20px;
-  width: 700px;
-
-  p,
-  h1 {
-    margin: 0;
-  }
-
-  .sttOpen {
-    color: #328d08;
-  }
-
-  .kind-restaurant {
-    font-size: 15px;
-    color: #888888;
-  }
-
-  .rating {
-    .start {
-      color: #FFD700;
-    }
-
-    .countRate {
-      font-size: 15px;
-      background-color: #ffc107;
-      color: #fff;
-      border-radius: 5px;
-      padding: 2px 5px 2px 5px;
-      margin-left: 5px;
-    }
-  }
-
-  .name-restaurant {
-    font-size: 30px;
-    font-weight: bold;
-  }
-
-  .add-restautant {
-    font-size: 15px;
-
-  }
-
-  .timeOpen {
-    font-size: 15px;
-    color: #000;
-  }
-
-  a {
-    text-decoration: none;
-  }
-
-  .const-restaurant {
-    font-size: 15px;
-
-    span {
-      margin-left: 10px;
-      color: #888888;
-    }
-  }
-}
 
 .lb-hearder-title {
   font-size: 25px;
@@ -131,7 +50,7 @@ nav a:first-of-type {
   height: 50px;
   display: grid;
   margin-bottom: 20px;
-  grid-template-columns: 300px auto 400px;
+  grid-template-columns: 300px 1fr auto;
   align-items: left;
   padding: 0px 50px 0px 50px;
 
@@ -171,6 +90,7 @@ nav a:first-of-type {
     margin: auto 0px auto 0px;
     height: 40px;
     width: auto;
+    cursor: pointer;
   }
 
   .c-user {

@@ -89,10 +89,7 @@
         height: auto;
     }
 
-    .isSelected {
-        background-color: #ee4d2d;
-        height: 3px;
-    }
+
 
     .tab-category {
         color: #fff;
@@ -102,10 +99,22 @@
         text-align: center;
         justify-content: center;
         align-items: center;
+
+        span.isSelected {
+            color: #ee4d2d;
+            background-color: transparent;
+        }
+
+        .isSelected {
+            background-color: #ee4d2d;
+            height: 3px;
+        }
     }
 
     .tab-category:hover {
         color: #ee4d2d;
+
+
     }
 
     .tag-search {

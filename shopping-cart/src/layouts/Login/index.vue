@@ -11,7 +11,7 @@
             </div>
             <div class="c-tab-category">
                 <div class="tab-category" v-for="item in categorySearch" :id="item.id" @click="chooseTabCategory(item)">
-                    <span>{{ item.display_text }}</span>
+                    <span :class="{ isSelected: item.isSelected }">{{ item.display_text }}</span>
                     <div :class="{ isSelected: item.isSelected }"> </div>
                 </div>
             </div>
@@ -129,10 +129,16 @@ const registerClick = () => {
     router?.push('/register');
 }
 const chooseTabCategory = (item) => {
+    if (item.display_text !== "Đồ ăn") {
+        alert("Comming soon");
+        return;
+    }
+
     categorySearch.value.forEach(item => {
         item.isSelected = false;
     });
     item.isSelected = !item.isSelected;
+
 }
 const chooseTagSearch = (item) => {
     alert('comming soon');
@@ -178,7 +184,7 @@ const getData = async () => {
     categorySearch.value.forEach(item => {
         item.isSelected = false;
     });
-    categorySearch.value[0].isSelected = true;
+    categorySearch.value[2].isSelected = true;
 
 
 }

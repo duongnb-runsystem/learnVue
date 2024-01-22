@@ -8,12 +8,11 @@ import OrderCart from '@/components/product/OrderCart.vue';
 import { useCartStore } from '@/stores/carts.js'
 import fireBaseApp from '@/firebase.js';
 import { getDatabase, ref as dbRef, set, onValue, get } from 'firebase/database';
-import { getAuth } from 'firebase/auth';
-import { getDataShopCommon } from '@/core/utils/common';
-import { useRouter } from 'vue-router';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getDataShopCommon, dataDetailShop, formatVND } from '@/core/utils/common.js';
 import { useRestaurantStore } from '@/stores/restaurant.js';
+import { useCommonStore } from '@/stores/_common.js';
 
-const router = useRouter();
 const menu = ref(null);
 const showDetail = ref(false);
 const searchTerm = ref('')
@@ -23,12 +22,21 @@ const listProduct = ref(null);
 const itemDetail = ref(null);
 const showOrderCart = ref(false);
 const db = getDatabase();
+const urldb = ref('');
+const urlShop = ref('');
+const address = ref(null);
+const kind = ref(null);
+const name = ref(null);
+const rattingCount = ref(null);
+const rattingStart = ref(null);
+const minOrder = ref(null);
+const maxOrder = ref(null);
+const urlImgThumb = ref(null);
+const phone = ref(null);
+const showDetailShop = ref(false);
 
 const syncCartWithFirebase = () => {
-  const userId = getIdAuth();
-  const dataRes = useRestaurantStore().getRestaurant;
-  const urldb = userId + "/" + dataRes.restaurant_url;
-  const dataRef = dbRef(db, urldb);
+  const dataRef = dbRef(db, urldb.value);
   onValue(dataRef, (snapshot) => {
     cart.value = snapshot.val() === null ? [] : snapshot.val();
     menu.value.forEach(itemMenu => {
@@ -43,19 +51,22 @@ const syncCartWithFirebase = () => {
 }
 const getIdAuth = () => {
   const auth = getAuth(fireBaseApp);
-  const user = auth.currentUser;
-  if (user) {
-    return user.uid;
-  } else {
-    return null
-  }
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      return user.uid;
+    } else {
+      return null
+    }
+  });
 }
-onMounted(() => {
-  const data = useRestaurantStore().getRestaurant;
-  if (data) {
-    const url = data.restaurant_url;
-    getData(url)
-  }
+onMounted(async () => {
+  const data = useRestaurantStore()?.getRestaurant;
+  urlShop.value = data?.restaurant_url ?? localStorage.getItem('urlShop');
+  console.log(urlShop.value)
+  getData(urlShop.value)
+  getDataDetailShop(urlShop.value);
+  localStorage.setItem('urlShop', urlShop.value);
+  urldb.value = getIdAuth() + "/" + urlShop.value;
 })
 const getData = async (url) => {
   const res = await getDataShopCommon(url);
@@ -71,17 +82,28 @@ const getData = async (url) => {
   menu.value.forEach(item => {
     dataCategory.value.push({ id: item.id, name: item.dish_type_name });
   });
-}
 
+}
+const getDataDetailShop = async (url) => {
+  const data = await dataDetailShop(url);
+  //get detail shop for header
+  address.value = data.address;
+  name.value = data.name;
+  kind.value = data.categories[0];
+  rattingCount.value = data.rating.display_total_review;
+  minOrder.value = formatVND(data.price_range.min_price);
+  maxOrder.value = formatVND(data.price_range.max_price);
+  rattingStart.value = parseInt(data.rating.avg.toFixed());
+  urlImgThumb.value = data.photos[9].value;
+  phone.value = data.phones[0];
+  showDetailShop.value = true;
+}
 const showDetailClick = (item) => {
   itemDetail.value = item;
   showDetail.value = true;
 }
 const saveCartToFireBase = () => {
-  const dataRes = useRestaurantStore().getRestaurant;
-  const userId = getIdAuth();
-  const urldb = userId + "/" + dataRes.restaurant_url;
-  const dataRef = dbRef(db, urldb);
+  const dataRef = dbRef(db, urldb.value);
   set(dataRef, cart.value);
 }
 
@@ -151,15 +173,40 @@ const orderCart = () => {
   saveCartToFireBase();
   showOrderCart.value = false;
 }
+const gotoHome = () => {
+  router.push('/home');
+}
 </script>
 
 <template>
+  <div class="c-hearder-banner" v-if="showDetailShop">
+    <img class="img-banner" :src="urlImgThumb" @click="gotoHome" />
+    <div class="c-hearder-infor">
+      <p class="kind-restaurant">{{ kind }}</p>
+      <h1 class="name-restautant">{{ name }}</h1>
+      <p class="add-restautant">{{ address }}</p>
+      <p class="add-restautant">SĐT: {{ phone }}</p>
+      <div class="rating">
+        <font-awesome-icon v-for="item in rattingStart" :id="item" class="start" :icon="['fas', 'star']" />
+        <span class="countRate"> {{ rattingCount }}</span>
+        đánh giá trên ShopeeFood
+      </div>
+      <a href="https://foody.vn/ho-chi-minh/highlands-coffee-bach-dang" rel="noopener noreferrer nofollow" target="_blank"
+        class="number-review">Xem thêm lượt đánh giá từ Foody</a>
+      <p><span class="sttOpen">● Mở cửa</span> - <span class="timeOpen">🕖 07:00 ~ 22:00</span></p>
+      <div class="const-restaurant">
+        <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
+        <span> {{ minOrder }} ~ {{ maxOrder }}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="col-content">
     <div class="col-left">
-      <ListMenu :data="dataCategory" @scrollCategory="scrollCategory"></ListMenu>
+      <ListMenu :data="dataCategory" @scrollCategory="scrollCategory" v-if="dataCategory.length > 0"></ListMenu>
     </div>
     <div class="center-content">
-      <input class="f-search" v-model="searchTerm" placeholder="Tìm Món ...">
+      <input class="f-search" v-model="searchTerm" placeholder="Tìm Món ..." v-if="dataCategory.length > 0">
       <ListProduct ref="listProduct" :menu="menu" :querry="searchTerm" @showDetailEmit="showDetailClick"
         @addCart="addProduct" @subCart="subProduct">
       </ListProduct>
