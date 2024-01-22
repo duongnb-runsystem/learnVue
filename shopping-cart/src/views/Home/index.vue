@@ -26,7 +26,9 @@ const db = getDatabase();
 
 const syncCartWithFirebase = () => {
   const userId = getIdAuth();
-  const dataRef = dbRef(db, userId);
+  const dataRes = useRestaurantStore().getRestaurant;
+  const urldb = userId + "/" + dataRes.restaurant_url;
+  const dataRef = dbRef(db, urldb);
   onValue(dataRef, (snapshot) => {
     cart.value = snapshot.val() === null ? [] : snapshot.val();
     menu.value.forEach(itemMenu => {
@@ -76,8 +78,10 @@ const showDetailClick = (item) => {
   showDetail.value = true;
 }
 const saveCartToFireBase = () => {
+  const dataRes = useRestaurantStore().getRestaurant;
   const userId = getIdAuth();
-  const dataRef = dbRef(db, userId);
+  const urldb = userId + "/" + dataRes.restaurant_url;
+  const dataRef = dbRef(db, urldb);
   set(dataRef, cart.value);
 }
 
@@ -93,7 +97,7 @@ const syncQuantityIntoMenu = (item) => {
 const addProduct = (item) => {
   showDetail.value = false;
   // Check if the item already exists in the cart
-  let existItem = cart.value.find((itemCart) => itemCart.id === item.id);
+  let existItem = cart?.value?.find((itemCart) => itemCart?.id === item?.id);
   if (existItem) {
     // If the item already exists, increase its quantity by 1
     existItem.quantity++;

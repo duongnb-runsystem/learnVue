@@ -29,6 +29,7 @@ const categorySearch = ref([]);
 
 onMounted(() => {
   getCategoryShop();
+  getDataUser();
 });
 const res = computed(() => {
   const data = useRestaurantStore().getRestaurant;
@@ -39,6 +40,18 @@ const res = computed(() => {
   }
   return data
 })
+const getDataUser = () => {
+  //get data user
+  const auth = getAuth(fireBaseApp);
+  const user = auth.currentUser;
+  console.log('user', user)
+  if (user) {
+    nameUser.value = user.displayName;
+    avatarUser.value = user.photoURL;
+  } else {
+    // No user is signed in.
+  }
+}
 const getData = async (url) => {
   const data = await dataDetailShop(url);
   //get detail shop for header
@@ -53,15 +66,7 @@ const getData = async (url) => {
   urlImgThumb.value = data.photos[9].value;
   phone.value = data.phones[0];
   isCallApi.value = true;
-  //get data user
-  const auth = getAuth(fireBaseApp);
-  const user = auth.currentUser;
-  if (user) {
-    nameUser.value = user.displayName;
-    avatarUser.value = user.photoURL;
-  } else {
-    // No user is signed in.
-  }
+
 }
 
 const getCategoryShop = async () => {
