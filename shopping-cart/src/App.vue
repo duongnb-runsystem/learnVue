@@ -10,7 +10,6 @@ import useCommon from './core/hooks/useCommon'
 const { storeGetters } = useCommon('useCommonStore')
 const isLoading = computed(() => {
   const { loading } = storeGetters()
-  console.log('app', loading.value);
   return loading.value
 })
 </script>

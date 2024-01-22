@@ -62,7 +62,6 @@ const getIdAuth = () => {
 onMounted(async () => {
   const data = useRestaurantStore()?.getRestaurant;
   urlShop.value = data?.restaurant_url ?? localStorage.getItem('urlShop');
-  console.log(urlShop.value)
   getData(urlShop.value)
   getDataDetailShop(urlShop.value);
   localStorage.setItem('urlShop', urlShop.value);
@@ -173,14 +172,12 @@ const orderCart = () => {
   saveCartToFireBase();
   showOrderCart.value = false;
 }
-const gotoHome = () => {
-  router.push('/home');
-}
+
 </script>
 
 <template>
   <div class="c-hearder-banner" v-if="showDetailShop">
-    <img class="img-banner" :src="urlImgThumb" @click="gotoHome" />
+    <img class="img-banner" :src="urlImgThumb" />
     <div class="c-hearder-infor">
       <p class="kind-restaurant">{{ kind }}</p>
       <h1 class="name-restautant">{{ name }}</h1>

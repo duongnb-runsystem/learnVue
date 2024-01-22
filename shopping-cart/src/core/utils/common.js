@@ -154,7 +154,6 @@ export const calculateTotal = (data, includeAdditionalFee) => {
   return formatVND(sum);
 };
 export const getIdShopCommon = async (urlRestaurent) => {
-  console.log(urlRestaurent);
   let rsIdShop = await service.get(`api/delivery/get_from_url?url=ho-chi-minh/${urlRestaurent}`);
   return rsIdShop?.data?.reply?.delivery_id;
 }
