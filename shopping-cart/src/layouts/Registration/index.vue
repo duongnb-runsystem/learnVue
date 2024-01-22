@@ -132,6 +132,7 @@ const registerClick = async () => {
             authStore.setEmailRegister(email.value);
             signOut(auth);
             useCommonStore().setLoading(false);
+            router.push('/');
         })
             .catch((error) => {
                 msgError.value = processErrorFirebase(error.code);

@@ -103,6 +103,7 @@ const subCartItem = (item) => {
 .item-menu {
     display: flex;
     background-color: #fff;
+    width: 900px;
     border-radius: 15px;
     margin-bottom: 10px;
     margin-top: 10px;
