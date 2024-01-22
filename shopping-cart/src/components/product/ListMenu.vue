@@ -7,8 +7,10 @@ const emit = defineEmits(['scrollCategory']);
 <template>
     <div class="left-content">
         <h1>Thực đơn</h1>
-        <div class="c-category" :id="item.id" v-for="item in data" @click="emit('scrollCategory', item)">
-            <h3>{{ item.name }}</h3>
+        <div class="c-category">
+            <div class="i-category" :id="item.id" v-for="item in data" @click="emit('scrollCategory', item)">
+                <h3>{{ item.name }}</h3>
+            </div>
         </div>
     </div>
 </template>
@@ -24,9 +26,16 @@ const emit = defineEmits(['scrollCategory']);
     align-items: right;
     justify-content: right;
     text-align: left;
+
 }
 
 .c-category {
+    height: 500px;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.i-category {
     display: flex;
     padding-left: 10px;
     margin-top: 10px;
@@ -41,12 +50,12 @@ const emit = defineEmits(['scrollCategory']);
         text-align: left;
         align-items: center;
         overflow: hidden;
-        white-space: nowrap;
+        white-space: wrap;
         text-overflow: ellipsis;
     }
 }
 
-.c-category:hover {
+.i-category:hover {
     border-radius: 5px;
     background-color: rgb(217, 217, 217);
 }
