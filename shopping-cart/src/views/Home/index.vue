@@ -1,16 +1,13 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeMount } from 'vue';
+import { ref, onMounted } from 'vue';
 import DetailProduct from '@/components/product/DetailProduct.vue';
 import ListProduct from '@/components/product/ListProduct.vue';
 import ListCart from '@/components/product/ListCart.vue';
 import ListMenu from '@/components/product/ListMenu.vue';
 import OrderCart from '@/components/product/OrderCart.vue';
-import fireBaseApp from '@/firebase.js';
-import { getDatabase, ref as dbRef, set, onValue, get, query, orderByChild } from 'firebase/database';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getDataShopCommon, dataDetailShop, formatVND } from '@/core/utils/common.js';
+import { getDatabase, ref as dbRef, set, onValue } from 'firebase/database';
+import { getMenuShop, dataDetailShop, formatVND } from '@/core/utils/common.js';
 import { useRestaurantStore } from '@/stores/restaurant.js';
-import useCommon from '@/core/hooks/useCommon'
 
 const menu = ref(null);
 const showDetail = ref(false);
@@ -23,16 +20,20 @@ const showOrderCart = ref(false);
 const db = getDatabase();
 const urldb = ref('');
 const urlShop = ref('');
-const address = ref(null);
-const kind = ref(null);
-const name = ref(null);
-const rattingCount = ref(null);
-const rattingStart = ref(null);
-const minOrder = ref(null);
-const maxOrder = ref(null);
-const urlImgThumb = ref(null);
-const phone = ref(null);
 const showDetailShop = ref(false);
+const isAscCart = ref(true);
+
+const dataHeader = ref({
+  address: String,
+  name: String,
+  kind: String,
+  rattingCount: Number,
+  rattingStart: Number,
+  minOrder: String,
+  maxOrder: String,
+  phone: String,
+  urlImgThumb: String,
+})
 
 const syncCartWithFirebase = () => {
   const id = localStorage.getItem('userId');
@@ -61,7 +62,7 @@ onMounted(async () => {
   localStorage.setItem('urlShop', urlShop.value);
 })
 const getData = async (url) => {
-  const res = await getDataShopCommon(url);
+  const res = await getMenuShop(url);
   menu.value = res.data.reply.menu_infos.filter(item => item.dish_type_id !== -1);
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
@@ -78,16 +79,17 @@ const getData = async (url) => {
 const getDataDetailShop = async (url) => {
   const data = await dataDetailShop(url);
   //get detail shop for header
-  address.value = data.address;
-  name.value = data.name;
-  kind.value = data.categories[0];
-  rattingCount.value = data.rating.display_total_review;
-  minOrder.value = formatVND(data.price_range.min_price);
-  maxOrder.value = formatVND(data.price_range.max_price);
-  rattingStart.value = parseInt(data.rating.avg.toFixed());
-  urlImgThumb.value = data.photos[9].value;
-  phone.value = data.phones[0];
   showDetailShop.value = true;
+  dataHeader.value = {
+    address: data.address,
+    name: data.name,
+    kind: data.categories[0],
+    rattingCount: data.rating.display_total_review,
+    minOrder: formatVND(data.price_range.min_price),
+    maxOrder: formatVND(data.price_range.max_price),
+    phone: data.phones[0],
+    urlImgThumb: data.photos[9].value,
+  }
 }
 const showDetailClick = (item) => {
   itemDetail.value = item;
@@ -152,9 +154,6 @@ const scrollCategory = (item) => {
 
 const orderCart = () => {
   alert("Đặt hàng thành công");
-  cart.value.forEach(item => {
-    item.quantity = 0;
-  });
   menu.value.forEach(itemMenu => {
     itemMenu.dishes.forEach(itemDish => {
       itemDish.quantity = 0;
@@ -164,23 +163,31 @@ const orderCart = () => {
   saveCartToFireBase();
   showOrderCart.value = false;
 }
+
 const sortCart = () => {
-  const dataRef = dbRef(db, urldb.value);
-  var c = query(dataRef, orderByChild('quantity'));
+  isAscCart.value = !isAscCart.value;
+  cart.value.sort((a, b) => {
+    if (isAscCart.value) {
+      return b.quantity - a.quantity;
+    }
+    else
+      return a.quantity - b.quantity;
+  });
+  saveCartToFireBase();
 }
 </script>
 
 <template>
   <div class="c-hearder-banner" v-if="showDetailShop">
-    <img class="img-banner" :src="urlImgThumb" />
+    <img class="img-banner" :src="dataHeader.urlImgThumb" />
     <div class="c-hearder-infor">
-      <p class="kind-restaurant">{{ kind }}</p>
-      <h1 class="name-restautant">{{ name }}</h1>
-      <p class="add-restautant">{{ address }}</p>
-      <p class="add-restautant">SĐT: {{ phone }}</p>
+      <p class="kind-restaurant">{{ dataHeader.kind }}</p>
+      <h1 class="name-restautant">{{ dataHeader.name }}</h1>
+      <p class="add-restautant">{{ dataHeader.address }}</p>
+      <p class="add-restautant">SĐT: {{ dataHeader.phone }}</p>
       <div class="rating">
-        <font-awesome-icon v-for="item in rattingStart" :id="item" class="start" :icon="['fas', 'star']" />
-        <span class="countRate"> {{ rattingCount }}</span>
+        <font-awesome-icon v-for="item in dataHeader.rattingCount" :id="item" class="start" :icon="['fas', 'star']" />
+        <span class="countRate"> {{ dataHeader.rattingCount }}</span>
         đánh giá trên ShopeeFood
       </div>
       <a href="https://foody.vn/ho-chi-minh/highlands-coffee-bach-dang" rel="noopener noreferrer nofollow" target="_blank"
@@ -188,7 +195,7 @@ const sortCart = () => {
       <p><span class="sttOpen">● Mở cửa</span> - <span class="timeOpen">🕖 07:00 ~ 22:00</span></p>
       <div class="const-restaurant">
         <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
-        <span> {{ minOrder }} ~ {{ maxOrder }}</span>
+        <span> {{ dataHeader.minOrder }} ~ {{ dataHeader.maxOrder }}</span>
       </div>
     </div>
   </div>
@@ -208,6 +215,7 @@ const sortCart = () => {
       </ListCart>
     </div>
   </div>
+
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
     <DetailProduct :item="itemDetail" :show="showDetail" @close="showDetail = false" @addCart="addProduct">

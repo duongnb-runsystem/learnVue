@@ -75,18 +75,26 @@ const gotoHome = () => {
             <span :class="{ isSelectedlb: item.isSelected }">{{ item.display_text }}</span>
             <div :class="{ isSelected: item.isSelected }"> </div>
           </div>
+
         </div>
         <div class="c-user">
+          <div class="c-input-search">
+            <input class="f-search" v-model="searchShop" placeholder="Tìm địa điểm, món ăn, địa chỉ...">
+            <div class="btn-search" @click="searchClick">
+              <font-awesome-icon class="ic-search" icon="magnifying-glass" />
+            </div>
+          </div>
           <img :src="avatarUser" v-if="avatarUser" />
           <span class="lb-name">{{ nameUser }}</span>
           <span class="btn-logout" @click="logout">Đăng xuất</span>
         </div>
-
       </div>
-
     </header>
     <div class="layout-root">
       <router-view></router-view>
+    </div>
+    <div class="c-footer">
+
     </div>
   </div>
 </template>

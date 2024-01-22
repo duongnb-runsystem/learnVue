@@ -3,12 +3,6 @@
         <div class="c-nowSearch">
             <h1 class="title">Đặt Đồ ăn, giao hàng từ 20'...</h1>
             <p class="local">có 77201 địa điểm ở TP. HCM từ 00:00 - 23:59</p>
-            <div class="c-input-search">
-                <input class="f-search" v-model="searchHome" placeholder="Tìm địa điểm, món ăn, địa chỉ...">
-                <div class="btn-search" @click="searchClick">
-                    <font-awesome-icon class="ic-search" icon="magnifying-glass" />
-                </div>
-            </div>
             <div class="c-tab-category">
                 <div class="tab-category" v-for="item in categorySearch" :id="item.id" @click="chooseTabCategory(item)">
                     <span :class="{ isSelected: item.isSelected }">{{ item.display_text }}</span>
@@ -67,15 +61,17 @@
 
 <script setup>
 import ModalError from '@/components/baseForm/ModalError.vue';
-import { computed, onBeforeMount, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import router from '@/router/index';
-import service from '@/services/axios.service'
+import service from '@/services/axios.service.js'
 import { useAuthStore } from '@/stores/auth.js'
 import UiInputValidation from '@/components/baseForm/UiInputValidation.vue';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import fireBaseApp from '@/firebase.js';
 import { isValidEmail } from '@/core/utils/regexValidate.js'
 import { processErrorFirebase } from '@/core/utils/common.js'
+import { API_ALL_CATEGORY } from '@/core/constants/app.js'
+
 const msgError = ref('');
 const showErorr = ref(false);
 const authStore = useAuthStore();
@@ -86,6 +82,7 @@ const inValidatePassword = ref(false);
 const remember = ref(false);
 const messageValidatePassword = ref('Không được bỏ trống');
 const messageValidateEmail = ref('Không được bỏ trống');
+
 const tagSearch = computed(() => {
     let arr = [];
     categorySearch.value.forEach(item => {
@@ -101,7 +98,7 @@ const updateEmail = (value) => {
 const updatePassword = (value) => {
     password.value = value;
 }
-const searchHome = ref('');
+const searchShop = ref('');
 const categorySearch = ref([]);
 
 const forgotPassword = () => {
@@ -116,24 +113,22 @@ const loginGoogle = () => {
         routerToHome();
 
     }).catch((error) => {
+        console.log(error)
         // Handle Errors here.
     })
 }
 const loginFacebook = () => {
     alert('comming soon');
 }
-const searchClick = () => {
-    alert('comming soon');
+const searchClick = async () => {
+    console.log(searchShop.value);
+    alert('comming soon', searchShop.value);
 }
+
 const registerClick = () => {
     router?.push('/register');
 }
 const chooseTabCategory = (item) => {
-    if (item.display_text !== "Đồ ăn") {
-        alert("Comming soon");
-        return;
-    }
-
     categorySearch.value.forEach(item => {
         item.isSelected = false;
     });
@@ -145,26 +140,9 @@ const chooseTagSearch = (item) => {
 }
 const loginClick = async () => {
     inValidateEmail.value = inValidatePassword.value = false;
-    if (email?.value?.length === 0) {
-        inValidateEmail.value = true;
-        messageValidateEmail.value = "Không được bỏ trống";
-        return;
-    }
-    if (!isValidEmail(email.value)) {
-        inValidateEmail.value = true;
-        messageValidateEmail.value = "Email không hợp lệ";
-        return;
-    }
-    if (password?.value?.length === 0) {
-        inValidatePassword.value = true;
-        messageValidatePassword.value = "Không được bỏ trống";
-        return;
-    }
-
     if (email.value.length > 0 && password.value.length > 0) {
         if (remember.value)
             localStorage.setItem('isRememberLogin', JSON.stringify(true));
-        // routerToHome();
         const auth = getAuth(fireBaseApp);
         await signInWithEmailAndPassword(auth, email.value, password.value).then((userCredential) => {
             const user = userCredential.user;
@@ -176,18 +154,32 @@ const loginClick = async () => {
                 showErorr.value = true;
             })
     }
+    else {
+        if (email?.value?.length === 0) {
+            inValidateEmail.value = true;
+            messageValidateEmail.value = "Không được bỏ trống";
+            return;
+        }
+        if (!isValidEmail(email.value)) {
+            inValidateEmail.value = true;
+            messageValidateEmail.value = "Email không hợp lệ";
+            return;
+        }
+        if (password?.value?.length === 0) {
+            inValidatePassword.value = true;
+            messageValidatePassword.value = "Không được bỏ trống";
+            return;
+        }
+    }
 }
 
 const getData = async () => {
-    let data = await service.get('/api/landing_page/get_web_footers_by_city_id?city_id=217');
+    let data = await service.get(API_ALL_CATEGORY);
     categorySearch.value = data.data.reply.web_footer.filter(item => item.link !== 'https://shopeefood.vn');
-    //add property selected to categorySearch
     categorySearch.value.forEach(item => {
         item.isSelected = false;
     });
     categorySearch.value[2].isSelected = true;
-
-
 }
 onMounted(() => {
     let emailRegister = authStore.getEmailRegister;

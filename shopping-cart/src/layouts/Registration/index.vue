@@ -47,7 +47,6 @@ import { useAuthStore } from '@/stores/auth';
 import { isValidEmail } from '@/core/utils/regexValidate.js';
 import { processErrorFirebase } from '@/core/utils/common.js';
 import ModalError from '@/components/baseForm/ModalError.vue';
-import { update } from 'firebase/database';
 import { useCommonStore } from '@/stores/_common.js';
 
 const authStore = useAuthStore();

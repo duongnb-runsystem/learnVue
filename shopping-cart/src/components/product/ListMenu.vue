@@ -56,6 +56,7 @@ const emit = defineEmits(['scrollCategory']);
     display: flex;
     padding-left: 10px;
     margin-top: 10px;
+    cursor: pointer;
 
     h3 {
         overflow: hidden;

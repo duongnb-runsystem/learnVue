@@ -22,8 +22,6 @@ const totalPrice = computed(() => {
     return calculateTotal(props.data, true);
 })
 
-
-
 </script>
 <template>
     <div class="c-content" v-if="data?.length">
@@ -66,6 +64,23 @@ const totalPrice = computed(() => {
 .c-list-cart {
     overflow-y: auto;
     max-height: 300px;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #fff;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 }
 
 .fa-sort {

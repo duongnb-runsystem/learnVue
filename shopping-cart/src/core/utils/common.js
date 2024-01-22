@@ -4,6 +4,7 @@ import app from '@/main'
 import * as store from '@/stores'
 import { registerRuntimeCompiler } from 'vue'
 import service from '@/services/axios.service'
+import { API_GET_ID_SHOP, API_GET_DETAIL_SHOP, API_GET_MENU_SHOP } from '@/core/constants/app.js'
 /**
  * Create instance router
  * Use in file *.js. If want to use function "handleRouter" in *.vue => /hooks/commom.ts
@@ -154,18 +155,18 @@ export const calculateTotal = (data, includeAdditionalFee) => {
   return formatVND(sum);
 };
 export const getIdShopCommon = async (urlRestaurent) => {
-  let rsIdShop = await service.get(`api/delivery/get_from_url?url=ho-chi-minh/${urlRestaurent}`);
+  let rsIdShop = await service.get(API_GET_ID_SHOP + urlRestaurent);
   return rsIdShop?.data?.reply?.delivery_id;
 }
 export const dataDetailShop = async (urlRestaurent) => {
   var id = await getIdShopCommon(urlRestaurent);
-  const result = await service.get(`api/delivery/get_detail?id_type=2&request_id=${id}`);
+  const result = await service.get(API_GET_DETAIL_SHOP + id);
   return result?.data?.reply?.delivery_detail;
 }
 
-export const getDataShopCommon = async (url) => {
+export const getMenuShop = async (url) => {
   var id = await getIdShopCommon(url);
   //get menu
-  const res = await service.get(`api/dish/get_delivery_dishes?id_type=2&request_id=${id}`);
+  const res = await service.get(API_GET_MENU_SHOP + id);
   return res;
 }
