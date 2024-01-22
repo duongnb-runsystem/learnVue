@@ -9,7 +9,7 @@ export const useAuthStore = defineStore('auth', {
         return { ...initState }
     },
     getters: {
-        getEmailRegister: (state) => state.emailRegister
+        getEmailRegister: (state) => state.emailRegister,
     },
     actions: {
         setEmailRegister(email) {

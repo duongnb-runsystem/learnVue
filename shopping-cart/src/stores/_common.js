@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 const initState = {
-  loading: false
+  loading: false,
 }
 
 export const useCommonStore = defineStore('common', {
@@ -11,6 +11,6 @@ export const useCommonStore = defineStore('common', {
   actions: {
     setLoading(status) {
       this.loading = status
-    }
+    },
   }
 })

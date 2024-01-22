@@ -4,8 +4,6 @@ import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import fireBaseApp from '@/firebase.js';
 import router from '@/router/index';
 import service from '@/services/axios.service';
-import { useRestaurantStore } from '@/stores/restaurant.js';
-
 import { ref, onMounted } from 'vue';
 /**
  * Layout: use for pages're logged

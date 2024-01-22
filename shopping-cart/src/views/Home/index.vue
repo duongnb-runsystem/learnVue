@@ -5,13 +5,12 @@ import ListProduct from '@/components/product/ListProduct.vue';
 import ListCart from '@/components/product/ListCart.vue';
 import ListMenu from '@/components/product/ListMenu.vue';
 import OrderCart from '@/components/product/OrderCart.vue';
-import { useCartStore } from '@/stores/carts.js'
 import fireBaseApp from '@/firebase.js';
-import { getDatabase, ref as dbRef, set, onValue, get } from 'firebase/database';
+import { getDatabase, ref as dbRef, set, onValue, get, query, orderByChild } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDataShopCommon, dataDetailShop, formatVND } from '@/core/utils/common.js';
 import { useRestaurantStore } from '@/stores/restaurant.js';
-import { useCommonStore } from '@/stores/_common.js';
+import useCommon from '@/core/hooks/useCommon'
 
 const menu = ref(null);
 const showDetail = ref(false);
@@ -36,10 +35,13 @@ const phone = ref(null);
 const showDetailShop = ref(false);
 
 const syncCartWithFirebase = () => {
+  const id = localStorage.getItem('userId');
+  urldb.value = id + "/" + urlShop.value;
   const dataRef = dbRef(db, urldb.value);
   onValue(dataRef, (snapshot) => {
     cart.value = snapshot.val() === null ? [] : snapshot.val();
-    menu.value.forEach(itemMenu => {
+
+    menu?.value?.forEach(itemMenu => {
       itemMenu.dishes.forEach(itemDish => {
         let existItem = cart.value.find((itemCart) => itemCart.id === itemDish.id);
         if (existItem) {
@@ -49,23 +51,14 @@ const syncCartWithFirebase = () => {
     });
   });
 }
-const getIdAuth = () => {
-  const auth = getAuth(fireBaseApp);
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      return user.uid;
-    } else {
-      return null
-    }
-  });
-}
+
 onMounted(async () => {
   const data = useRestaurantStore()?.getRestaurant;
   urlShop.value = data?.restaurant_url ?? localStorage.getItem('urlShop');
   getData(urlShop.value)
   getDataDetailShop(urlShop.value);
+
   localStorage.setItem('urlShop', urlShop.value);
-  urldb.value = getIdAuth() + "/" + urlShop.value;
 })
 const getData = async (url) => {
   const res = await getDataShopCommon(url);
@@ -75,9 +68,8 @@ const getData = async (url) => {
       itemDish.quantity = 0;
     });
   })
-  //get data cart from firebase  
-  syncCartWithFirebase();
 
+  syncCartWithFirebase();
   menu.value.forEach(item => {
     dataCategory.value.push({ id: item.id, name: item.dish_type_name });
   });
@@ -124,14 +116,14 @@ const addProduct = (item) => {
     existItem.quantity++;
     syncQuantityIntoMenu(existItem);
     // save cart to local storage
-    saveCartToFireBase();
-  } else {
+  }
+  else {
     // If the item does not exist, set its quantity to 1 and add it to the cart
     item.quantity = 1;
     cart.value.push(item);
     // save cart to local storage
-    saveCartToFireBase();
   }
+  saveCartToFireBase();
 }
 
 const subProduct = (item) => {
@@ -172,7 +164,10 @@ const orderCart = () => {
   saveCartToFireBase();
   showOrderCart.value = false;
 }
-
+const sortCart = () => {
+  const dataRef = dbRef(db, urldb.value);
+  var c = query(dataRef, orderByChild('quantity'));
+}
 </script>
 
 <template>
@@ -209,7 +204,8 @@ const orderCart = () => {
       </ListProduct>
     </div>
     <div class="col-right">
-      <ListCart :data="cart" @removeCart="removeCartClick" @orderCart="showOrderCart = true;"></ListCart>
+      <ListCart @sortCart="sortCart" :data="cart" @removeCart="removeCartClick" @orderCart="showOrderCart = true;">
+      </ListCart>
     </div>
   </div>
   <Teleport to="body">

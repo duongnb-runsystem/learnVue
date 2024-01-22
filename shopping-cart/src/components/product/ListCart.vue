@@ -17,26 +17,20 @@ const sumPrice = computed(() => {
     return calculateTotal(props.data, false);
 })
 
-const emit = defineEmits(['removeCart', 'orderCart']);
+const emit = defineEmits(['removeCart', 'orderCart', 'sortCart']);
 const totalPrice = computed(() => {
     return calculateTotal(props.data, true);
 })
 
-const isSortAtoZ = ref(true);
-const scrSort = ref();
-const changeSort = () => {
-    isSortAtoZ.value = !isSortAtoZ.value;
-    scrSort.value = isSortAtoZ ? "arrow-down-a-z" : "arrow-down-z-a"
-    const sortOrder = isSortAtoZ.value ? 1 : -1;
-    props.data.value = props.data.sort((a, b) => sortOrder * (a.quantity - b.quantity));
-}
+
+
 </script>
 <template>
     <div class="c-content" v-if="data?.length">
         <div class="c-header">
-            <h1 @click="sortCart()">Giỏ hàng</h1>
+            <h1>Giỏ hàng</h1>
             <p class="lb-cart" v-if="isCollaps">{{ sumCart }} </p>
-            <font-awesome-icon class="fa-sort" v-if="!isCollaps" @click="changeSort" icon="sort" />
+            <font-awesome-icon class="fa-sort" v-if="!isCollaps" @click="emit('sortCart')" icon="sort" />
             <font-awesome-icon class="fa-collap" :class="{ rotated: isCollaps }" icon="chevron-up"
                 @click="isCollaps = !isCollaps" />
         </div>

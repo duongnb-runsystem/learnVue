@@ -168,6 +168,7 @@ const loginClick = async () => {
         const auth = getAuth(fireBaseApp);
         await signInWithEmailAndPassword(auth, email.value, password.value).then((userCredential) => {
             const user = userCredential.user;
+            localStorage.setItem('userId', user.uid);
             routerToHome();
         })
             .catch((error) => {
