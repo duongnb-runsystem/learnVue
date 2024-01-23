@@ -50,8 +50,11 @@ const chooseTabCategory = (item) => {
   item.isSelected = !item.isSelected;
 }
 const logout = async () => {
+  console.log('logout')
   localStorage.setItem('isRememberLogin', JSON.stringify(false));
+  localStorage.setItem('searchRestaurant', null);
   localStorage.removeItem('searchRestaurant');
+  localStorage.removeItem('userId');
   const auth = getAuth(fireBaseApp);
   await signOut(auth).then(() => {
     // Sign-out successful.
