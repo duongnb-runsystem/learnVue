@@ -113,16 +113,11 @@ const loginGoogle = () => {
         routerToHome();
 
     }).catch((error) => {
-        console.log(error)
         // Handle Errors here.
     })
 }
 const loginFacebook = () => {
     alert('comming soon');
-}
-const searchClick = async () => {
-    console.log(searchShop.value);
-    alert('comming soon', searchShop.value);
 }
 
 const registerClick = () => {

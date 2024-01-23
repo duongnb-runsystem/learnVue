@@ -41,14 +41,12 @@ const searchShop = ref('');
 const searchError = ref(false);
 onMounted(() => {
     const searchRestaurant = localStorage.getItem('searchRestaurant');
-    console.log(searchRestaurant);
     if (searchRestaurant === null)
         getDataAllRestaurant();
     else {
         searchShop.value = searchRestaurant;
         getDataBySearchRestaurant();
     }
-    console.log('onMounted restaurant');
 })
 const getDataAllRestaurant = async () => {
     // const url = 'https://gappapi.deliverynow.vn/api/delivery/get_infos';
@@ -80,7 +78,6 @@ const chooseRestaurant = (item) => {
     router.push('/shop');
 }
 const searchRestaurant = () => {
-    console.log(searchShop.value);
     localStorage.setItem('searchRestaurant', searchShop.value);
     getDataBySearchRestaurant();
 }

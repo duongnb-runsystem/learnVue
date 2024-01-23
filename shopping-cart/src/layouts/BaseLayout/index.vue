@@ -50,7 +50,6 @@ const chooseTabCategory = (item) => {
   item.isSelected = !item.isSelected;
 }
 const logout = async () => {
-  console.log('logout')
   localStorage.setItem('isRememberLogin', JSON.stringify(false));
   localStorage.setItem('searchRestaurant', null);
   localStorage.removeItem('searchRestaurant');
