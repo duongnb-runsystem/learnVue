@@ -51,6 +51,7 @@ const chooseTabCategory = (item) => {
 }
 const logout = async () => {
   localStorage.setItem('isRememberLogin', JSON.stringify(false));
+  localStorage.removeItem('searchRestaurant');
   const auth = getAuth(fireBaseApp);
   await signOut(auth).then(() => {
     // Sign-out successful.
@@ -62,6 +63,7 @@ const logout = async () => {
 const gotoHome = () => {
   router.push('/home');
 }
+
 </script>
 
 <template>
@@ -78,12 +80,6 @@ const gotoHome = () => {
 
         </div>
         <div class="c-user">
-          <div class="c-input-search">
-            <input class="f-search" v-model="searchShop" placeholder="Tìm địa điểm, món ăn, địa chỉ...">
-            <div class="btn-search" @click="searchClick">
-              <font-awesome-icon class="ic-search" icon="magnifying-glass" />
-            </div>
-          </div>
           <img :src="avatarUser" v-if="avatarUser" />
           <span class="lb-name">{{ nameUser }}</span>
           <span class="btn-logout" @click="logout">Đăng xuất</span>

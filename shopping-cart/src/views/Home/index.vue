@@ -33,6 +33,7 @@ const dataHeader = ref({
   maxOrder: String,
   phone: String,
   urlImgThumb: String,
+  urlReview: String,
 })
 
 const syncCartWithFirebase = () => {
@@ -80,6 +81,7 @@ const getDataDetailShop = async (url) => {
   const data = await dataDetailShop(url);
   //get detail shop for header
   showDetailShop.value = true;
+  console.log(data);
   dataHeader.value = {
     address: data.address,
     name: data.name,
@@ -89,6 +91,7 @@ const getDataDetailShop = async (url) => {
     maxOrder: formatVND(data.price_range.max_price),
     phone: data.phones[0],
     urlImgThumb: data.photos[9].value,
+    urlReview: "https://www.foody.vn/ho-chi-minh/" + data.url_rewrite_name,
   }
 }
 const showDetailClick = (item) => {
@@ -190,8 +193,8 @@ const sortCart = () => {
         <span class="countRate"> {{ dataHeader.rattingCount }}</span>
         đánh giá trên ShopeeFood
       </div>
-      <a href="https://foody.vn/ho-chi-minh/highlands-coffee-bach-dang" rel="noopener noreferrer nofollow" target="_blank"
-        class="number-review">Xem thêm lượt đánh giá từ Foody</a>
+      <a :href="dataHeader.urlReview" target="_blank">Xem thêm
+        lượt đánh giá từ Foody</a>
       <p><span class="sttOpen">● Mở cửa</span> - <span class="timeOpen">🕖 07:00 ~ 22:00</span></p>
       <div class="const-restaurant">
         <font-awesome-icon :icon="['fas', 'money-bill-wave']" />
