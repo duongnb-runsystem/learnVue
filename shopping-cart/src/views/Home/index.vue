@@ -75,13 +75,12 @@ const getData = async (url) => {
   menu.value.forEach(item => {
     dataCategory.value.push({ id: item.id, name: item.dish_type_name });
   });
-
+  console.log(menu.value);
 }
 const getDataDetailShop = async (url) => {
   const data = await dataDetailShop(url);
   //get detail shop for header
   showDetailShop.value = true;
-  console.log(data);
   dataHeader.value = {
     address: data.address,
     name: data.name,

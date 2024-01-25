@@ -82,8 +82,15 @@ const subCartItem = (item) => {
     cursor: pointer;
 
     .c-infor {
-        width: 60%;
+        width: 500px;
         margin-left: 10px;
+
+        p,
+        h3 {
+            white-space: wrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 
     .c-price {
