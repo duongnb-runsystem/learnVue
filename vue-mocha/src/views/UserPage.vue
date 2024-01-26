@@ -2,24 +2,22 @@
   <div class="c-content">
     <div class="c-l-user">
       <div v-if="isLoading" class="loading-mask">Loading...</div>
-      <ul class="l-users">
-        <li class="header">
-          <span>Selected</span>
-          <span>No</span>
-          <span>Name</span>
-          <span>Email</span>
-          <span>Phone</span>
-        </li>
-        <div class="content">
-          <li v-for="(item, index) in users" :id="item.id" :key="index" @click="selectUser(item)">
-            <input v-model="selectedUser" type="radio" :value="item" />
-            <span>{{ item.id }}</span>
-            <span>{{ item.name }}</span>
-            <span>{{ item.email }}</span>
-            <span>{{ item.phone }}</span>
-          </li>
-        </div>
-      </ul>
+
+      <DataTable
+        v-model:selection="selectedUser"
+        :value="users"
+        data-key="id"
+        selection-mode="single"
+        table-style="min-width: 50rem"
+        scrollable
+        scroll-height="flex"
+      >
+        <Column selection-mode="single" header-style="width: 3rem"></Column>
+        <Column field="id" header="No"></Column>
+        <Column field="name" header="Name"></Column>
+        <Column field="email" header="Email"></Column>
+        <Column field="phone" header="Phone"></Column>
+      </DataTable>
     </div>
     <hr />
     <div class="c-function">
@@ -55,11 +53,16 @@ import UserForm from "@/components/UserForm.vue";
 import { UserDto } from "@/core/dto/userDto";
 import { ToastUtils } from "@/core/utils/toastUtils";
 import DeleteUserModal from "@/components/DeleteUserModal.vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+
 export default defineComponent({
   name: "UserPage",
   components: {
     UserForm,
     DeleteUserModal,
+    DataTable,
+    Column,
   },
   setup() {
     const users = ref(new Array<UserDto>());
@@ -74,9 +77,6 @@ export default defineComponent({
     const isLoading = ref(false);
     const isAddUser = ref(false);
 
-    const selectUser = (d: UserDto) => {
-      selectedUser.value = d;
-    };
     const getUsers = async () => {
       await ApiService.GET("/users")
         .then((res) => {
@@ -195,7 +195,6 @@ export default defineComponent({
       handleEditUser,
       handleDeleteUser,
       handleAddUser,
-      selectUser,
       users,
       showConfirmBtn,
       modeForm,
@@ -235,34 +234,6 @@ export default defineComponent({
       justify-content: center;
       align-items: center;
       z-index: 1;
-    }
-
-    .l-users {
-      list-style-type: none;
-      padding: 0;
-      text-align: center;
-
-      .header {
-        font-weight: bold;
-      }
-
-      .content {
-        height: 700px;
-        overflow-y: scroll;
-      }
-
-      li {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-        margin-top: 5px;
-        padding: 10px;
-        background-color: #f0f0f0;
-      }
-
-      .seletected {
-        background-color: #ffa7a7;
-      }
     }
   }
 
