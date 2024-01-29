@@ -21,7 +21,7 @@
     </div>
     <hr />
     <div class="c-function">
-      <div class="c-btn-ced">
+      <div class="c-group-btn">
         <button :disabled="showConfirmBtn" @click="btnAddClick">Add</button>
         <button :disabled="showConfirmBtn" @click="btnEditClick">Edit</button>
         <button :disabled="showConfirmBtn" @click="btnDelClick">Delete</button>
@@ -29,7 +29,7 @@
       <div class="c-form-user">
         <UserForm v-model:user="selectedUser" :mode="modeForm" :errors="errors" />
       </div>
-      <div v-if="showConfirmBtn" class="c-btn-ced">
+      <div v-if="showConfirmBtn" class="c-group-btn">
         <button @click="btnCancelClick">Cancel</button>
         <button @click="btnSubmitClick">Submit</button>
       </div>
@@ -53,8 +53,8 @@ import UserForm from "@/components/UserForm.vue";
 import { UserDto } from "@/core/dto/userDto";
 import { ToastUtils } from "@/core/utils/toastUtils";
 import DeleteUserModal from "@/components/DeleteUserModal.vue";
-import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import DataTable from "primevue/datatable";
 
 export default defineComponent({
   name: "UserPage",
@@ -250,7 +250,7 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
 
-    .c-btn-ced {
+    .c-group-btn {
       text-align: right;
 
       button {
