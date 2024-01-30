@@ -8,7 +8,7 @@ import { TestUtils } from "../../utils/testUitls";
 import { expect } from "chai";
 import { flushPromises, mount } from "@vue/test-utils";
 import DataTable from "primevue/datatable";
-import UserPage from "@/views/UserPage.vue";
+import UserView from "@/views/UserView.vue";
 import UserForm from "@/components/UserForm.vue";
 import DeleteUserModal from "@/components/DeleteUserModal.vue";
 interface IApiCodesStub {
@@ -103,7 +103,7 @@ describe("UserPage", () => {
     //create api stub
     const stub = createStub();
     // mount component
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
 
     try {
@@ -132,7 +132,7 @@ describe("UserPage", () => {
     }
   });
   it("No.2 [Normal]: Initial view mode > Click button Add,disable btn Add,Edit,Delete , show btn Cancel/Submit,show loading on dataTable ", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     try {
       await wrapper.vm.$nextTick();
@@ -171,7 +171,7 @@ describe("UserPage", () => {
     }
   });
   it("No.3 [Normal]: Initial display > Click Add > User input data null, Validate failed name is required", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     const dataInputUser = new UserDto({
       name: "",
@@ -213,7 +213,7 @@ describe("UserPage", () => {
   });
 
   it("No.4 [Normal]: Initial display > Click Add > User input data null, Validate failed email is required", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     const dataInputUser = new UserDto({
       name: "John Doe",
@@ -255,7 +255,7 @@ describe("UserPage", () => {
   });
 
   it("No.5 [Normal]: Initial display > Click Add > User input data null, Validate failed email is not valid", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     const dataInputUser = new UserDto({
       name: "John Doe",
@@ -297,7 +297,7 @@ describe("UserPage", () => {
   });
 
   it("No.6 [Normal]: Initial display > Click Edit > User input data null, Validate failed name is required", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     const dataInputUser = new UserDto({
       name: "",
@@ -338,7 +338,7 @@ describe("UserPage", () => {
   });
 
   it("No.7 [Normal]: Initial display > Click Edit > User input data null, Validate failed email is required", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     const dataInputUser = new UserDto({
       name: "John Doe",
@@ -381,7 +381,7 @@ describe("UserPage", () => {
   });
 
   it("No.8 [Normal]: Initial display > Click Edit > User input data null, Validate failed email is not valid", async () => {
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     const dataInputUser = new UserDto({
       name: "John Doe",
@@ -433,7 +433,7 @@ describe("UserPage", () => {
     });
     const stubGet = createStub();
     const stubPost = createPostStub(dataInputUser);
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
 
     try {
@@ -482,7 +482,7 @@ describe("UserPage", () => {
     });
     const stubGet = createStub();
     const stubPut = createPutStub();
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
 
     try {
@@ -518,7 +518,7 @@ describe("UserPage", () => {
 
   it("No.11 [Normal] : Initial display > Click add > Show load > click Cancel > hiden load", async () => {
     createStub();
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     try {
       await wrapper.vm.$nextTick();
@@ -548,7 +548,7 @@ describe("UserPage", () => {
 
   it("No.12 [Normal] : Initial display > Click edit > Show load > click Cancel > hiden load", async () => {
     createStub();
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     try {
       await wrapper.vm.$nextTick();
@@ -578,7 +578,7 @@ describe("UserPage", () => {
   it("No.13 [Normal] : Initial display > Click Delete > Show loading> Show dialog > click Delete > hiden load", async () => {
     const stubGet = createStub();
     const stubDelete = createDeleteStub();
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     try {
       await wrapper.vm.$nextTick();
@@ -608,7 +608,7 @@ describe("UserPage", () => {
   });
   it("No.14 [Normal] : Initial display > Click Delete > Show loading> Show dialog > click Cancel > hiden load", async () => {
     createStub();
-    const wrapper = mount(UserPage);
+    const wrapper = mount(UserView);
     await flushPromises();
     try {
       await wrapper.vm.$nextTick();
