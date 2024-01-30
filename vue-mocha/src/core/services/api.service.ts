@@ -89,7 +89,7 @@ const ApiService = {
 
   DELETE: <T = TAnyType>(url: string, config?: AxiosRequestConfig) => {
     return instance<T>(url, { method: "delete", url, ...config });
-  }
+  },
 };
 
 export default ApiService;
