@@ -146,35 +146,36 @@ export default defineComponent({
       showDeleteModal.value = true;
     };
     const btnCancelClick = () => {
+      errors.value.name = "";
+      errors.value.email = "";
       isLoading.value = false;
       showConfirmBtn.value = false;
       changeModeForm("view");
+      selectedUser.value = users.value[0];
     };
     const btnSubmitClick = () => {
-      isLoading.value = false;
-      showConfirmBtn.value = false;
-      changeModeForm("view");
       // validate name
       if (selectedUser.value.name.length === 0) {
         errors.value.name = "Name is required";
       } else {
         errors.value.name = "";
       }
-      // validate email
-      if (selectedUser.value.email.length === 0) {
-        errors.value.email = "Email is required";
-      } else {
-        errors.value.email = "";
-      }
       // validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(selectedUser.value.email)) {
-        errors.value.email = "Email address is not valid";
+        if (selectedUser.value.email.length === 0) {
+          errors.value.email = "Email is required";
+        } else {
+          errors.value.email = "Email address is not valid";
+        }
       } else {
         errors.value.email = "";
       }
 
       if (errors.value.name.length === 0 && errors.value.email.length === 0) {
+        isLoading.value = false;
+        showConfirmBtn.value = false;
+        changeModeForm("view");
         if (isAddUser.value) {
           handleAddUser();
         } else {
